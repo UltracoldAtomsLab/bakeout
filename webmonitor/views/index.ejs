@@ -1,0 +1,301 @@
+<html>
+ <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Bakeout monitor</title>
+    <link href="/css/layout.css" rel="stylesheet" type="text/css">
+    <script language="javascript" type="text/javascript" src="/js/libs/jquery-1.8.2.min.js"></script>
+    <script src="/js/libs/jquery-ui-1.9.0.custom.min.js"></script>
+    <script src="/js/libs/underscore.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/js/libs/smoothie.js"></script>
+    <script type="text/javascript" src="/js/libs/moment.min.js"></script>
+ </head>
+
+ <body>
+ 
+ <div id="chamberdiv">
+ <img id="chamber" src="/img/chamber.png" alt="Vacuum chamber" width="1361" height="300">
+ </div>
+
+ <div id="tc0div" class="showvals">
+  <label class="fieldlabel">Cell 1</label>
+  <input id="tc0val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc1div" class="showvals">
+  <label class="fieldlabel">Cell 2</label>
+  <input id="tc1val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc2div" class="showvals">
+  <label class="fieldlabel">D.Cube 1</label>
+  <input id="tc2val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc3div" class="showvals">
+  <label class="fieldlabel">Slower 3</label>
+  <input id="tc3val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc4div" class="showvals">
+  <label class="fieldlabel">Outside</label>
+  <input id="tc4val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc5div" class="showvals">
+  <label class="fieldlabel">TSP</label>
+  <input id="tc5val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc6div" class="showvals">
+  <label class="fieldlabel">Hose</label>
+  <input id="tc6val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc7div" class="showvals">
+  <label class="fieldlabel">Ion pump 1</label>
+  <input id="tc7val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc8div" class="showvals">
+  <label class="fieldlabel">Slower 1</label>
+  <input id="tc8val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc9div" class="showvals">
+  <label class="fieldlabel">Cell cover</label>
+  <input id="tc9val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc10div" class="showvals">
+  <label class="fieldlabel">D.Cube 2</label>
+  <input id="tc10val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc11div" class="showvals">
+  <label class="fieldlabel">Slower 2</label>
+  <input id="tc11val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc12div" class="showvals">
+  <label class="fieldlabel">Ion pump 2</label>
+  <input id="tc12val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc13div" class="showvals">
+  <label class="fieldlabel">Ampule</label>
+  <input id="tc13val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc14div" class="showvals">
+  <label class="fieldlabel">Gate valve</label>
+  <input id="tc14val" value="??.?? C" size="8">
+ </div>
+
+ <div id="tc15div" class="showvals">
+  <label class="fieldlabel">Viewport</label>
+  <input id="tc15val" value="??.?? C" size="8">
+ </div>
+
+ <div id="colddiv" class="showvals">
+  <label class="fieldlabel">COLDPOINT</label>
+  <input id="coldval" value="??.?? C" size="8">
+ </div>
+
+<!-- Charts -->
+ <div id="tc0cdiv" class="charts">
+  <label class="fieldlabel">Cell 1</label>
+  <canvas id="tc0chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc1cdiv" class="showvals">
+  <label class="fieldlabel">Cell 2</label>
+  <canvas id="tc1chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc2cdiv" class="showvals">
+  <label class="fieldlabel">D.Cube 1</label>
+  <canvas id="tc2chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc3cdiv" class="showvals">
+  <label class="fieldlabel">Slower 3</label>
+  <canvas id="tc3chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc4cdiv" class="showvals">
+  <label class="fieldlabel">Outside</label>
+  <canvas id="tc4chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc5cdiv" class="showvals">
+  <label class="fieldlabel">TSP</label>
+  <canvas id="tc5chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc6cdiv" class="showvals">
+  <label class="fieldlabel">Hose</label>
+  <canvas id="tc6chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc7cdiv" class="showvals">
+  <label class="fieldlabel">Ion pump 1</label>
+  <canvas id="tc7chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc8cdiv" class="showvals">
+  <label class="fieldlabel">Slower 1</label>
+  <canvas id="tc8chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc9cdiv" class="showvals">
+  <label class="fieldlabel">Cell cover</label>
+  <canvas id="tc9chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc10cdiv" class="showvals">
+  <label class="fieldlabel">D.Cube 2</label>
+  <canvas id="tc10chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc11cdiv" class="showvals">
+  <label class="fieldlabel">Slower 2</label>
+  <canvas id="tc11chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc12cdiv" class="showvals">
+  <label class="fieldlabel">Ion pump 2</label>
+  <canvas id="tc12chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc13cdiv" class="showvals">
+  <label class="fieldlabel">Ampule</label>
+  <canvas id="tc13chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc14cdiv" class="showvals">
+  <label class="fieldlabel">Gate valve</label>
+  <canvas id="tc14chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="tc15cdiv" class="showvals">
+  <label class="fieldlabel">Viewport</label>
+  <canvas id="tc15chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <div id="coldcdiv" class="showvals">
+  <label class="fieldlabel">COLDPOINT</label>
+  <canvas id="coldchart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
+ <script>
+   var lastsince;
+
+   var fieldsl;
+
+   var showReadings = function(data) {
+       for (var i = 0; i < data.length; i++) {
+          reading = data[i];
+          if (fields[reading['id']]) {
+              if (reading.reading.value < 200) {
+                thisone = fields[reading['id']];
+                thisone['value'].val(reading.reading.value+' '+reading.reading.unit);
+                thisone['chart'].append(new Date(reading.date).getTime(), reading.reading.value);
+              }
+          }
+       }
+   }
+
+   var reread = function() {
+      lastsince = getdata(lastsince, showReadings);
+   }
+
+   var getdata = function(since, cb) {
+     var now = moment();
+     $.ajax({url: '/readings',
+             data: {'sincedate': now.toDate(),
+                    'tilldate':  since.toDate()
+                    },
+             success: function(data) { cb(data) }
+            });
+     return now;
+   }
+
+   var charts = [new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart(),
+                 new SmoothieChart()
+                ];
+   var series = [new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries(),
+                 new TimeSeries()
+                 ];
+
+
+   $(document).ready(function() {
+     fields = {"tc0": {"value": $("#tc0val"), "chart": series[0]},
+               "tc1": {"value": $("#tc1val"), "chart": series[1]},
+               "tc2": {"value": $("#tc2val"), "chart": series[2]},
+               "tc3": {"value": $("#tc3val"), "chart": series[3]},
+               "tc4": {"value": $("#tc4val"), "chart": series[4]},
+               "tc5": {"value": $("#tc5val"), "chart": series[5]},
+               "tc6": {"value": $("#tc6val"), "chart": series[6]},
+               "tc7": {"value": $("#tc7val"), "chart": series[7]},
+               "tc8": {"value": $("#tc8val"), "chart": series[8]},
+               "tc9": {"value": $("#tc9val"), "chart": series[9]},
+               "tc10": {"value": $("#tc10val"), "chart": series[10]},
+               "tc11": {"value": $("#tc11val"), "chart": series[11]},
+               "tc12": {"value": $("#tc12val"), "chart": series[12]},
+               "tc13": {"value": $("#tc13val"), "chart": series[13]},
+               "tc14": {"value": $("#tc14val"), "chart": series[14]},
+               "tc15": {"value": $("#tc15val"), "chart": series[15]},
+               "coldpoint": {"value": $("#coldval"), "chart": series[16]}
+      };
+
+      var since = moment().subtract('minutes', 10);
+      lastsince = getdata(since, showReadings);
+
+      setInterval(reread, 2000);
+      for(var i = 0; i < 16; i++) {
+         chart = charts[i];
+         chart.addTimeSeries(series[i]);
+         chart.options.millisPerPixel = 1000;
+         chart.options.grid.millisPerLine = 60000;
+         chart.streamTo(document.getElementById("tc"+i+"chart"));
+      }
+         chart = charts[16];
+         chart.addTimeSeries(series[16]);
+         chart.options.millisPerPixel = 1000;
+         chart.options.grid.millisPerLine = 60000;
+         chart.streamTo(document.getElementById("coldchart"));
+   });
+ </script>
+ </body>
+</html>
