@@ -261,6 +261,11 @@ input {
  font-family: monospace;
  font-weight: bold;
  size: 4;
+ border: 3px solid white;
+}
+
+.warning {
+ border: 3px solid red;
 }
 
 #messages {
@@ -272,4 +277,24 @@ input {
 #messagebox {
   width: 300;
   height: 300;
+}
+
+#spanselect {
+  position: absolute;
+  top: 320;
+  left: 1450;
+}
+
+#loading {
+  position: absolute;
+  top: 375;
+  left: 1450;
+  font-family: monospace;
+  display: block;
+  font-size: 16;
+  background: #EE8888;
+}
+
+.hidden {
+  visibility: hidden;
 }

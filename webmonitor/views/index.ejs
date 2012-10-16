@@ -2,6 +2,7 @@
  <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Bakeout monitor</title>
+    <link href="/css/jquery-ui.css" rel="stylesheet" type="text/css">
     <link href="/css/layout.css" rel="stylesheet" type="text/css">
     <script language="javascript" type="text/javascript" src="/js/libs/jquery-1.8.2.min.js"></script>
     <script src="/js/libs/jquery-ui-1.9.0.custom.min.js"></script>
@@ -191,11 +192,35 @@
   <textarea id="messagebox"></textarea>
  </div>
 
+ <div id="spanselect">
+   <input type="radio" id="radio1" name="radio" checked="checked" /><label for="radio1">10 min</label>
+   <input type="radio" id="radio2" name="radio" /><label for="radio2">1h</label>
+   <input type="radio" id="radio3" name="radio" /><label for="radio3">12h</label>
+ </div>
+
+ <div id="loading">
+  Loading data, please wait...
+ </div>
+
  <script>
    var lastsince;
 
    var fieldsl;
    var msg;
+   var loadmsg;
+
+   var readyformore = false;
+
+   var chw = 550;
+   var spans = [10 * 60 * 1000 / chw, 60 * 60 * 1000 / chw, 12 * 60 * 60 * 1000 / chw];
+   var grids = [60 * 1000, 5 * 60 * 1000, 60 * 60 * 1000];
+   var limits = {"tc0": 202,
+                 "tc1": 202,
+                 "tc3": 162,
+                 "tc8": 162,
+                 "tc11": 162,
+                 "tc14": 192
+                };
 
    var showReadings = function(data) {
        if (data.result != 'OK') {
@@ -205,13 +230,22 @@
        for (var i = 0; i < readings.length; i++) {
           reading = readings[i];
           if (fields[reading['id']]) {
-              if (reading.reading.value < 200) {
+              if (reading.reading.value < 1000) {
+                if (limits[reading['id']] && (limits[reading['id']] <= reading.reading.value)) {
+                   $("#"+reading['id']+"val").addClass("warning");
+                } else {
+                   $("#"+reading['id']+"val").removeClass("warning");
+                }
                 thisone = fields[reading['id']];
                 thisone['value'].val(reading.reading.value+' '+reading.reading.unit);
                 thisone['chart'].append(new Date(reading.date).getTime(), reading.reading.value);
+              } else {
+                message("Error on channel "+reading['id']);
               }
           }
        }
+       readyformore = true;
+       loadmsg.addClass("hidden");
    }
 
    var message = function(todisplay) {
@@ -220,10 +254,14 @@
    }
 
    var reread = function() {
-      lastsince = getdata(lastsince, showReadings);
+      if (readyformore) {
+        lastsince = getdata(lastsince, showReadings);
+      };
    }
 
    var getdata = function(since, cb) {
+     readyformore = false;
+     loadmsg.removeClass("hidden");
      var now = moment();
      $.ajax({url: '/readings',
              data: {'sincedate': now.toDate(),
@@ -271,9 +309,12 @@
                  new TimeSeries()
                  ];
 
-
    $(document).ready(function() {
+     var rereadID;
+     $( "#spanselect" ).buttonset();
      msg = $("#messagebox");
+     loadmsg = $("#loading");
+
      fields = {"tc0": {"value": $("#tc0val"), "chart": series[0]},
                "tc1": {"value": $("#tc1val"), "chart": series[1]},
                "tc2": {"value": $("#tc2val"), "chart": series[2]},
@@ -296,19 +337,47 @@
       var since = moment().subtract('minutes', 10);
       lastsince = getdata(since, showReadings);
 
-      setInterval(reread, 2000);
+      rereadID = setInterval(reread, 2000);
       for(var i = 0; i < 16; i++) {
          chart = charts[i];
-         chart.addTimeSeries(series[i]);
-         chart.options.millisPerPixel = 1000;
-         chart.options.grid.millisPerLine = 60000;
+         chart.addTimeSeries(series[i], { strokeStyle:'rgb(255, 255, 255)', lineWidth:2 });
+         chart.options.millisPerPixel = spans[0];
+         chart.options.grid.millisPerLine = grids[0];
          chart.streamTo(document.getElementById("tc"+i+"chart"));
       }
          chart = charts[16];
-         chart.addTimeSeries(series[16]);
-         chart.options.millisPerPixel = 1000;
-         chart.options.grid.millisPerLine = 60000;
+         chart.addTimeSeries(series[16], { strokeStyle:'rgb(255, 255, 255)', lineWidth:2 });
+         chart.options.millisPerPixel = spans[0];
+         chart.options.grid.millisPerLine = grids[0];
          chart.streamTo(document.getElementById("coldchart"));
+
+      var selectSpan = function(span) {
+        clearInterval(rereadID);
+        for(var i = 0; i < 16; i++) {
+          chart = charts[i];
+          series[i].data=[];
+          chart.options.millisPerPixel = spans[span];
+          chart.options.grid.millisPerLine = grids[span];
+        }
+        chart = charts[16];
+        series[16].data=[];
+        chart.options.millisPerPixel = spans[span];
+        chart.options.grid.millisPerLine = grids[span];
+        var minutes = spans[span]*chw/(1000*60);
+        var since = moment().subtract('minutes', minutes);
+        lastsince = getdata(since, showReadings);
+        rereadID = setInterval(reread, 2000);
+      };
+
+      $("#radio1").click(function() {
+			 selectSpan(0);
+			 });
+      $("#radio2").click(function() {
+			 selectSpan(1);
+			 });
+      $("#radio3").click(function() {
+			 selectSpan(2);
+			 });
    });
  </script>
  </body>
