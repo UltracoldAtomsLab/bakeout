@@ -262,3 +262,14 @@ input {
  font-weight: bold;
  size: 4;
 }
+
+#messages {
+  position: absolute;
+  top: 0;
+  left: 1450;
+}
+
+#messagebox {
+  width: 300;
+  height: 300;
+}

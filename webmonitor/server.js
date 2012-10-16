@@ -55,10 +55,10 @@ app.get('/readings', function(req, res) {
 	.exec(function(err, readings) { 
             if (!err) {
               res.contentType('application/json');
-              res.send(readings);
+		res.send({"result": "OK", "readings": readings});
             } else {
               res.contentType('application/json');
-              res.send('{"result": "error"}');
+              res.send('{"result": "error reading database"}');
               console.log(err);
             }
         });

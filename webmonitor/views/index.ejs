@@ -188,14 +188,23 @@
   <canvas id="coldchart" class="tcchart" width="550" height="170"></canvas>
  </div>
 
+ <div id="messages">
+  <textarea id="messagebox"></textarea>
+ </div>
+
  <script>
    var lastsince;
 
    var fieldsl;
+   var msg;
 
    var showReadings = function(data) {
-       for (var i = 0; i < data.length; i++) {
-          reading = data[i];
+       if (data.result != 'OK') {
+          message(data.result);
+       }
+       readings = data.readings;
+       for (var i = 0; i < readings.length; i++) {
+          reading = readings[i];
           if (fields[reading['id']]) {
               if (reading.reading.value < 200) {
                 thisone = fields[reading['id']];
@@ -204,6 +213,11 @@
               }
           }
        }
+   }
+
+   var message = function(todisplay) {
+      var date = new Date();
+      msg.text(date+": "+todisplay+'\n'+msg.text());
    }
 
    var reread = function() {
@@ -260,6 +274,7 @@
 
 
    $(document).ready(function() {
+     msg = $("#messagebox");
      fields = {"tc0": {"value": $("#tc0val"), "chart": series[0]},
                "tc1": {"value": $("#tc1val"), "chart": series[1]},
                "tc2": {"value": $("#tc2val"), "chart": series[2]},
