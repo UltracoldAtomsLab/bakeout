@@ -240,7 +240,7 @@
                 thisone['value'].val(reading.reading.value+' '+reading.reading.unit);
                 thisone['chart'].append(new Date(reading.date).getTime(), reading.reading.value);
               } else {
-                message("Error on channel "+reading['id']);
+                message("Error on channel "+reading['id']+": "+reading.err);
               }
           }
        }
