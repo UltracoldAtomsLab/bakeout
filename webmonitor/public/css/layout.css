@@ -298,6 +298,7 @@ input {
   position: absolute;
   top: 320;
   left: 1450;
+  width: 300;
 }
 
 #loading {
@@ -308,6 +309,7 @@ input {
   display: block;
   font-size: 16;
   background: #EE8888;
+  width: 300;
 }
 
 .hidden {
