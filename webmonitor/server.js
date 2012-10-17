@@ -1,3 +1,5 @@
+var version = "v20121017-1452";
+
 // Import and setup
 var express = require('express'),
     uuid = require('node-uuid'),
@@ -42,7 +44,8 @@ Reading.findOne({ }, function (err, reading) {
 // Main page
 app.get('/', function(req, res) {
   res.render('index.ejs', {
-      layout: false
+      layout: false,
+      version: version
   });
 });
 
