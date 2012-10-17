@@ -25,7 +25,7 @@ def senddata(date, idnum, value):
                 "id": "vc%d" %(idnum),
                 "date": date,
                 "reading": {"value": value,
-                            "unit": "C"},
+                            "unit": "torr"},
                 "err": None,
                 }
     coll.insert(document)
