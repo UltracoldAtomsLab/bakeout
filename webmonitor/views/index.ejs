@@ -380,18 +380,21 @@
          chart.options.millisPerPixel = spans[0];
          chart.options.grid.millisPerLine = grids[0];
          chart.streamTo(document.getElementById("tc"+i+"chart"));
+         chart.fps = 1;
       }
          chart = charts[16];
          chart.addTimeSeries(series[16], { strokeStyle:'rgb(255, 255, 255)', lineWidth:2 });
          chart.options.millisPerPixel = spans[0];
          chart.options.grid.millisPerLine = grids[0];
          chart.streamTo(document.getElementById("coldchart"));
+         chart.fps = 1;
 
          chart = charts[17];
          chart.addTimeSeries(series[17], { strokeStyle:'rgb(150, 150, 255)', lineWidth:2 });
          chart.options.millisPerPixel = spans[0];
          chart.options.grid.millisPerLine = grids[0];
          chart.streamTo(document.getElementById("gauge1chart"));
+         chart.fps = 1;
 
       var selectSpan = function(span) {
         clearInterval(rereadID);
