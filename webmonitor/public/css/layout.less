@@ -1,4 +1,9 @@
 
+// Positioning parameters for Less
+@cw: 600px;
+@rh: 200px;
+@roff: 400px;
+
 #chamberdiv {
  position:absolute;
  top:0;
@@ -137,125 +142,127 @@
 /* Cell 1 */
 #tc0cdiv {
  position:absolute;
- top:400;
- left:0;
+ top: @rh * 0 + @roff;
+ left: @cw * 0;
 }
 
 /* Cell 2 */
 #tc1cdiv {
  position:absolute;
- top:400;
- left:600;
+ top: @rh * 0 + @roff;
+ left: @cw * 1;
 }
 
 /* DCube 1 */
 #tc2cdiv {
  position:absolute;
- top:600;
- left:0;
+ top: @rh * 3 + @roff;
+ left: @cw * 0;
 }
 
 /* Slower 3 */
 #tc3cdiv {
  position:absolute;
- top:1400;
- left:0;
+ top: @rh * 1 + @roff;
+ left: @cw * 2;
 }
 
 /* Outside */
 #tc4cdiv {
  position:absolute;
- top:800;
- left:0;
+ top: @rh * 5 + @roff;
+ left: @cw * 1;
 }
 
 /* TSP */
 #tc5cdiv {
  position:absolute;
- top:800;
- left:600;
+ top: @rh * 4 + @roff;
+ left: @cw * 2;
 }
 
 /* Hose */
 #tc6cdiv {
  position:absolute;
- top:1000;
- left:0;
+ top: @rh * 5 + @roff;
+ left: @cw * 0;
 }
 
 /* Ion Pump 1 */
 #tc7cdiv {
  position:absolute;
- top:1000;
- left:600;
+ top: @rh * 4 + @roff;
+ left: @cw * 0;
 }
 
 /* Slower 1 */
 #tc8cdiv {
  position:absolute;
- top:1200;
- left:0;
+ top: @rh * 1 + @roff;
+ left: @cw * 0;
 }
 
 /* Cell cover */
 #tc9cdiv {
  position:absolute;
- top:1200;
- left:600;
+ top: @rh * 3 + @roff;
+ left: @cw * 2;
 }
 
 /* DCube 2 */
 #tc10cdiv {
  position:absolute;
- top:600;
- left:600;
+ top: @rh * 3 + @roff;
+ left: @cw * 1;
 }
 
 /* Slower 2 */
 #tc11cdiv {
  position:absolute;
- top:1400;
- left:600;
+ top: @rh * 1 + @roff;
+ left: @cw * 1;
 }
 
 /* Ion Pump 2 */
 #tc12cdiv {
  position:absolute;
- top:1600;
- left:0;
+ top: @rh * 4 + @roff;
+ left: @cw * 1;
 }
 
 /* Ampulle */
 #tc13cdiv {
  position:absolute;
- top:1600;
- left:600;
+ top: @rh * 2 + @roff;
+ left: @cw * 1;
 }
 
 /* Gate valve */
 #tc14cdiv {
  position:absolute;
- top:1800;
- left:0;
+ top: @rh * 2 + @roff;
+ left: @cw * 0;
 }
 
 /* Viewport */
 #tc15cdiv {
  position:absolute;
- top:400;
- left:1200;
+ top: @rh * 2 + @roff;
+ left: @cw * 2;
 }
 
+/* Coldpoint */
 #coldcdiv {
  position:absolute;
- top:1800;
- left:600;
+ top: @rh * 5 + @roff;
+ left: @cw * 2;
 }
 
+/* Vacuum gauge */
 #gauge1cdiv {
  position:absolute;
- top:600;
- left:1200;
+ top: @rh * 0 + @roff;
+ left: @cw * 2;
 }
 
 .tcchart {
