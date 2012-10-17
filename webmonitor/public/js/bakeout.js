@@ -89,25 +89,27 @@ var limits = {"tc0": 202,
      return now;
    }
 
-   var charts = [new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart(),
-                 new SmoothieChart()
-                ];
+var fps = 30;
+var charts = [new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps}),
+              new SmoothieChart({'fps': fps, 'scale': 'log'})
+             ];
+
    var series = [new TimeSeries(),
                  new TimeSeries(),
                  new TimeSeries(),
@@ -164,21 +166,18 @@ var limits = {"tc0": 202,
          chart.options.millisPerPixel = spans[0];
          chart.options.grid.millisPerLine = grids[0];
          chart.streamTo(document.getElementById("tc"+i+"chart"));
-         chart.fps = 1;
       }
          chart = charts[16];
          chart.addTimeSeries(series[16], { strokeStyle:'rgb(255, 255, 255)', lineWidth:2 });
          chart.options.millisPerPixel = spans[0];
          chart.options.grid.millisPerLine = grids[0];
          chart.streamTo(document.getElementById("coldchart"));
-         chart.fps = 1;
 
          chart = charts[17];
          chart.addTimeSeries(series[17], { strokeStyle:'rgb(150, 150, 255)', lineWidth:2 });
          chart.options.millisPerPixel = spans[0];
          chart.options.grid.millisPerLine = grids[0];
          chart.streamTo(document.getElementById("gauge1chart"));
-         chart.fps = 1;
 
       var selectSpan = function(span) {
         clearInterval(rereadID);
