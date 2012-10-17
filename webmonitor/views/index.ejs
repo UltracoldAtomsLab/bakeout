@@ -102,6 +102,12 @@
   <input id="coldval" value="??.?? C" size="8">
  </div>
 
+  <div id="gauge1div" class="showvals">
+  <label class="fieldlabel">Gauge1</label>
+  <input id="gauge1val" value="?.?? torr" size="14">
+  </div>
+
+
 <!-- Charts -->
  <div id="tc0cdiv" class="charts">
   <label class="fieldlabel">Cell 1</label>
@@ -188,6 +194,11 @@
   <canvas id="coldchart" class="tcchart" width="550" height="170"></canvas>
  </div>
 
+ <div id="gauge1cdiv" class="showvals">
+  <label class="fieldlabel">Vacuum Gauge (Log10)</label>
+  <canvas id="gauge1chart" class="tcchart" width="550" height="170"></canvas>
+ </div>
+
  <div id="messages">
   <textarea id="messagebox"></textarea>
  </div>
@@ -202,14 +213,24 @@
   Loading data, please wait...
  </div>
 
+ <div id="time">
+ </div>
+
  <script>
    var lastsince;
 
-   var fieldsl;
+   var fields;
    var msg;
    var loadmsg;
 
    var readyformore = false;
+   var timer = document.getElementById("time");
+
+   var updateTime = function() {
+      timer.innerHTML = moment().format('H:mm:ss');
+   };
+   updateTime();
+   var timedisplay = setInterval(updateTime, 1000);
 
    var chw = 550;
    var spans = [10 * 60 * 1000 / chw, 60 * 60 * 1000 / chw, 12 * 60 * 60 * 1000 / chw];
@@ -224,12 +245,13 @@
 
    var showReadings = function(data) {
        if (data.result != 'OK') {
-          message(data.result);
-       }
-       readings = data.readings;
-       for (var i = 0; i < readings.length; i++) {
-          reading = readings[i];
-          if (fields[reading['id']]) {
+         message(data.result);
+       } else {
+         readings = data.readings;
+         for (var i = 0; i < readings.length; i++) {
+           reading = readings[i];
+           if (fields[reading['id']]) {
+            if (reading.type == 'temperature') {
               if (reading.reading.value < 1000) {
                 if (limits[reading['id']] && (limits[reading['id']] <= reading.reading.value)) {
                    $("#"+reading['id']+"val").addClass("warning");
@@ -240,17 +262,28 @@
                 thisone['value'].val(reading.reading.value+' '+reading.reading.unit);
                 thisone['chart'].append(new Date(reading.date).getTime(), reading.reading.value);
               } else {
-                message("Error on channel "+reading['id']+": "+reading.err);
+                message(moment(reading.date).format()+" Error on channel "+reading['id']+": "+reading.err);
               }
-          }
-       }
-       readyformore = true;
-       loadmsg.addClass("hidden");
+            } else if (reading.type == 'pressure') {
+                thisone = fields[reading['id']];
+                thisone['value'].val(reading.reading.value.toExponential()+' '+reading.reading.unit);
+                var logval = Math.log(reading.reading.value) / Math.LN10;
+                thisone['chart'].append(new Date(reading.date).getTime(), logval);
+            }
+           } else {
+             console.log("Missing id:"+reading['id']);
+           }
+        }
+      }
+      readyformore = true;
+      loadmsg.addClass("hidden");
    }
 
+   var getdate = function () {
+      return moment().format('MMMM Do YYYY, h:mm:ss a');
+   }
    var message = function(todisplay) {
-      var date = new Date();
-      msg.text(date+": "+todisplay+'\n'+msg.text());
+      msg.text(todisplay+'\n'+msg.text());
    }
 
    var reread = function() {
@@ -288,9 +321,11 @@
                  new SmoothieChart(),
                  new SmoothieChart(),
                  new SmoothieChart(),
+                 new SmoothieChart(),
                  new SmoothieChart()
                 ];
    var series = [new TimeSeries(),
+                 new TimeSeries(),
                  new TimeSeries(),
                  new TimeSeries(),
                  new TimeSeries(),
@@ -331,7 +366,8 @@
                "tc13": {"value": $("#tc13val"), "chart": series[13]},
                "tc14": {"value": $("#tc14val"), "chart": series[14]},
                "tc15": {"value": $("#tc15val"), "chart": series[15]},
-               "coldpoint": {"value": $("#coldval"), "chart": series[16]}
+               "coldpoint": {"value": $("#coldval"), "chart": series[16]},
+               "vc0": {"value": $("#gauge1val"), "chart": series[17]}
       };
 
       var since = moment().subtract('minutes', 10);
@@ -351,6 +387,12 @@
          chart.options.grid.millisPerLine = grids[0];
          chart.streamTo(document.getElementById("coldchart"));
 
+         chart = charts[17];
+         chart.addTimeSeries(series[17], { strokeStyle:'rgb(150, 150, 255)', lineWidth:2 });
+         chart.options.millisPerPixel = spans[0];
+         chart.options.grid.millisPerLine = grids[0];
+         chart.streamTo(document.getElementById("gauge1chart"));
+
       var selectSpan = function(span) {
         clearInterval(rereadID);
         for(var i = 0; i < 16; i++) {
@@ -363,6 +405,12 @@
         series[16].data=[];
         chart.options.millisPerPixel = spans[span];
         chart.options.grid.millisPerLine = grids[span];
+
+        chart = charts[17];
+        series[17].data=[];
+        chart.options.millisPerPixel = spans[span];
+        chart.options.grid.millisPerLine = grids[span];
+
         var minutes = spans[span]*chw/(1000*60);
         var since = moment().subtract('minutes', minutes);
         lastsince = getdata(since, showReadings);

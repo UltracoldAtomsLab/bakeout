@@ -125,6 +125,15 @@
  width:200px;
 }
 
+#gauge1div {
+ position:absolute;
+ top:325;
+ left:600;
+ border: 1px solid black;
+ width: 150px;
+ padding: 3px;
+}
+
 /* Cell 1 */
 #tc0cdiv {
  position:absolute;
@@ -239,6 +248,12 @@
 
 #coldcdiv {
  position:absolute;
+ top:1800;
+ left:600;
+}
+
+#gauge1cdiv {
+ position:absolute;
  top:600;
  left:1200;
 }
@@ -297,4 +312,15 @@ input {
 
 .hidden {
   visibility: hidden;
+}
+
+#time {
+  position: absolute;
+  top: 10;
+  left: 10;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 25;
+  border: 1px dotted black;
+  padding: 2px;
 }
