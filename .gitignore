@@ -3,3 +3,4 @@
 *~
 *.conf
 */node_modules/*
+*.csv
