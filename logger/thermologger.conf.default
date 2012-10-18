@@ -1,0 +1,7 @@
+[Database]
+host: localhost
+port: 27017
+database: baking
+[Gauge]
+com: 0
+baud: 115200
