@@ -5,19 +5,35 @@ import time
 import sys
 import pymongo
 import datetime
+import ConfigParser
+
+config = ConfigParser.SafeConfigParser({'baud': 38400,
+                                        'host': 'localhost',
+                                        'port': 27017,
+                                        'com': 0,
+                                        })
+if len(sys.argv) < 2:
+    print("usage: %s configfile" %(sys.argv[0]))
+    sys.exit(1)
+else:
+    configfile = sys.argv[1]
+    try:
+        config.read(configfile)
+    except:
+        raise
 
 ## Settings
-baud = 38400
-mongoserver = "brown.local"
-mongoport = 27017
-database = "baking"
+mongoserver = config.get('Database', 'host')
+mongoport = config.getint('Database', 'port')
+database = config.get('Database', 'database')
 
 # Check which port to log on
-serialnum = 0 if len(sys.argv) < 2 else int(sys.argv[1])
+baud = config.getint('Gauge', 'baud')
+serialnum = config.getint('Gauge', 'com')
 dev = serial.Serial('/dev/ttyS%d' %(serialnum), baud, timeout=2)
 
 connection = pymongo.Connection(mongoserver, mongoport)
-db = connection.baking
+db = connection[database]
 coll = db.readings
 
 def senddata(date, idnum, value):
