@@ -72,8 +72,8 @@ while True:
                                 "err": None,
                                 }
                     coll.insert(document)
-            except:
-                raise
+            except ValueError:
+                print "#ValueError"
                 pass
             print reading  # show on standard output
             sys.stdout.flush()  # enables following it real-time with cat
