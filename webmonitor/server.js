@@ -53,7 +53,6 @@ app.get('/', function(req, res) {
 app.get('/readings', function(req, res) {
     var sincedate = req.query['sincedate'],
         tilldate = req.query['tilldate'];
-    console.log(sincedate);
     Reading.find({}).where('date').lt(sincedate).gt(tilldate).sort({'date': 1})
 	.exec(function(err, readings) { 
             if (!err) {
