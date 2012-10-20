@@ -9,7 +9,8 @@ var express = require('express'),
     nconf = require('nconf'),
     io = require('socket.io'),
     mongoose = require('mongoose'),
-    http = require('http')
+    http = require('http'),
+    connect = require('connect')
     ;
 
 var db = mongoose.createConnection('brown.local', 'baking');
@@ -28,6 +29,7 @@ var readingSchema = new mongoose.Schema({
 var app = express();
 app.use(express.bodyParser());
 app.use(express.static(__dirname + '/public'));
+app.use(connect.compress());
 var server = http.createServer(app)
 
 var io = require('socket.io').listen(server);
