@@ -13,7 +13,28 @@ var express = require('express'),
     connect = require('connect')
     ;
 
-var db = mongoose.createConnection('brown.local', 'baking');
+// Read configuration
+nconf.file({ file: 'monitor.json' });
+var mongos = nconf.get('mongos'),
+    replicaset = nconf.get('replicaset');
+
+var mongooptions = {
+        'db': {
+            'native_parser': true
+        },
+        'server': {
+            'auto_reconnect': true,
+            'poolSize': 10
+        },
+        'replset': {
+            'readPreference': 'nearest',
+            'strategy': 'ping',
+            'rs_name': replicaset,
+            'slaveok': true
+        }
+    };
+
+var db = mongoose.createConnection(mongos, 'baking', mongooptions);
 
 var readingSchema = new mongoose.Schema({
   type:  String,
