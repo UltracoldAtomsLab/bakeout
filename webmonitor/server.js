@@ -1,4 +1,4 @@
-var version = "v20121022-1630";
+var version = "v20121022-1729";
 
 // Import and setup
 var express = require('express'),
@@ -10,7 +10,8 @@ var express = require('express'),
     io = require('socket.io'),
     mongoose = require('mongoose'),
     http = require('http'),
-    connect = require('connect')
+    connect = require('connect'),
+    os = require('os')
     ;
 
 // Read configuration
@@ -68,7 +69,8 @@ Reading.findOne({ }, function (err, reading) {
 app.get('/', function(req, res) {
   res.render('index.ejs', {
       layout: false,
-      version: version
+      version: version,
+      hostname: os.hostname()
   });
 });
 
