@@ -1,7 +1,6 @@
 [Database]
-host: localhost
-port: 27017
-database: baking
+hosts=localhost:27017,otherhost:27017
+database=baking
 [Gauge]
-com: 0
-baud: 115200
+com=0
+baud=115200

@@ -8,8 +8,7 @@ import datetime
 import ConfigParser
 
 config = ConfigParser.SafeConfigParser({'baud': 115200,
-                                        'host': 'localhost',
-                                        'port': 27017,
+                                        'hosts': 'localhost:27017',
                                         'com': 0,
                                         })
 if len(sys.argv) < 2:
@@ -23,8 +22,7 @@ else:
         raise
 
 ## Settings
-mongoserver = config.get('Database', 'host')
-mongoport = config.getint('Database', 'port')
+mongos = config.get('Database', 'hosts').split(',')
 database = config.get('Database', 'database')
 
 # Check which port to log on
@@ -32,7 +30,7 @@ baud = config.getint('Gauge', 'baud')
 serialnum = config.getint('Gauge', 'com')
 dev = serial.Serial('/dev/ttyACM%d' %(serialnum), baud, timeout=1)
 
-connection = pymongo.Connection(mongoserver, mongoport)
+connection = pymongo.Connection(mongos)
 db = connection[database]
 coll = db.readings
 
@@ -77,5 +75,7 @@ while True:
                 pass
             print reading  # show on standard output
             sys.stdout.flush()  # enables following it real-time with cat
+    except pymongo.errors.AutoReconnect:
+        continue
     except KeyboardInterrupt:
         break
