@@ -27,10 +27,15 @@ var limits = {"tc0": 202,
               "tc14": 192
              };
 
-   var showReadings = function(data) {
+var showReadings = function(data, first) {
        if (data.result != 'OK') {
          message(data.result);
        } else {
+           if (first) {
+               for (var i = 0; i < series.length; i++) {
+		   series[i].data = [];
+               }
+           }
          readings = data.readings;
          for (var i = 0; i < readings.length; i++) {
            reading = readings[i];
@@ -72,20 +77,31 @@ var limits = {"tc0": 202,
 
    var reread = function() {
       if (readyformore) {
-        lastsince = getdata(lastsince, showReadings);
+          lastsince = getdata(lastsince, showReadings, false);
       };
    }
 
-   var getdata = function(since, cb) {
+var getdata = function(since, cb, first) {
      readyformore = false;
      loadmsg.removeClass("hidden");
      var now = moment();
-     $.ajax({url: '/readings',
-             data: {'sincedate': now.toDate(),
-                    'tilldate':  since.toDate()
-                    },
-             success: function(data) { cb(data) }
-            });
+     var request = $.ajax({url: '/readings',
+			   data: {'sincedate': now.toDate(),
+				  'tilldate':  since.toDate()
+				 },
+			   success: function(data) { cb(data) }
+			  });
+
+     request.done(function(msg) {
+         cb(msg, first);
+     });
+
+     request.fail(function(jqXHR, textStatus) {
+      console.log( "Request failed: " + textStatus );
+      readyformore = true;
+      loadmsg.addClass("hidden");
+     });
+
      return now;
    }
 
@@ -157,7 +173,7 @@ var charts = [new SmoothieChart({'fps': fps}),
       };
 
       var since = moment().subtract('minutes', 10);
-      lastsince = getdata(since, showReadings);
+      lastsince = getdata(since, showReadings, true);
 
       rereadID = setInterval(reread, 2000);
       for(var i = 0; i < 16; i++) {
@@ -199,7 +215,7 @@ var charts = [new SmoothieChart({'fps': fps}),
 
         var minutes = spans[span]*chw/(1000*60);
         var since = moment().subtract('minutes', minutes);
-        lastsince = getdata(since, showReadings);
+          lastsince = getdata(since, showReadings, true);
         rereadID = setInterval(reread, 2000);
       };
 
