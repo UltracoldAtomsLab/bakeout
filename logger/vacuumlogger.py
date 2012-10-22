@@ -49,7 +49,6 @@ while True:
         line = dev.readline().strip()
         date = datetime.datetime.utcnow()
 
-
         vals = line.split(",")
         s1 = int(vals[0])
         if s1 == 0:
@@ -60,7 +59,7 @@ while True:
             r2 = float(vals[3])
             senddata(date, 1, r2)
         print time.time(), ",", line
-        sys.stdout.flush()  # enables following it real-time with cat        
+        sys.stdout.flush()  # enables following it real-time with cat
     except pymongo.errors.AutoReconnect:
 	continue
     except KeyboardInterrupt:
