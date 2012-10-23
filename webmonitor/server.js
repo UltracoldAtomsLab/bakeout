@@ -19,7 +19,15 @@ nconf.file({ file: 'monitor.json' });
 var mongos = nconf.get('mongos'),
     replicaset = nconf.get('replicaset'),
     database = nconf.get('database'),
-    sensors = nconf.get('sensors');
+    sensorsin = nconf.get('sensors');
+
+// Only load enabled sensors
+var sensors = [];
+for (var i = 0; i < sensorsin.length; i++) {
+    if (sensorsin[i].enabled) {
+	sensors.push(sensorsin[i]);
+    }
+}
 
 var mongooptions = {
         'db': {
