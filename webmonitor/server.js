@@ -17,7 +17,8 @@ var express = require('express'),
 // Read configuration
 nconf.file({ file: 'monitor.json' });
 var mongos = nconf.get('mongos'),
-    replicaset = nconf.get('replicaset');
+    replicaset = nconf.get('replicaset'),
+    database = nconf.get('database');
 
 var mongooptions = {
         'db': {
@@ -35,7 +36,7 @@ var mongooptions = {
         }
     };
 
-var db = mongoose.createConnection(mongos, 'baking', mongooptions);
+var db = mongoose.createConnection(mongos, database, mongooptions);
 
 var readingSchema = new mongoose.Schema({
   type:  String,
