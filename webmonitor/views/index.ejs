@@ -122,7 +122,7 @@ input {
   <% for(var i=0; i<sensors.length; i++) { %>
    <div id="<%= sensors[i].dbid %>div" class="showvals <% if (sensors[i].type == 'pressure') {%>pressurediv<%}%>">
     <label class="fieldlabel"><%= sensors[i].name %></label>
-    <input id="<%= sensors[i].dbid %>val" value="??.??" size="15">
+    <input id="<%= sensors[i].dbid %>val" value="??.??" size="13">
    </div>
   <% } %>
 
