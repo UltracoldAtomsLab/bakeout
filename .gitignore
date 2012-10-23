@@ -4,3 +4,4 @@
 *.conf
 */node_modules/*
 *.csv
+*.json
