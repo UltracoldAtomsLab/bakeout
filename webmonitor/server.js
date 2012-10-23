@@ -1,4 +1,4 @@
-var version = "v20121022-1729";
+var version = "v20121023-1544";
 
 // Import and setup
 var express = require('express'),
@@ -18,7 +18,8 @@ var express = require('express'),
 nconf.file({ file: 'monitor.json' });
 var mongos = nconf.get('mongos'),
     replicaset = nconf.get('replicaset'),
-    database = nconf.get('database');
+    database = nconf.get('database'),
+    sensors = nconf.get('sensors');
 
 var mongooptions = {
         'db': {
@@ -71,7 +72,8 @@ app.get('/', function(req, res) {
   res.render('index.ejs', {
       layout: false,
       version: version,
-      hostname: os.hostname()
+      hostname: os.hostname(),
+      sensors: sensors
   });
 });
 
