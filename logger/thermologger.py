@@ -71,8 +71,7 @@ while True:
                                 }
                     coll.insert(document)
             except ValueError:
-                print "#ValueError"
-                pass
+                raise # Make sure we crash
             print reading  # show on standard output
             sys.stdout.flush()  # enables following it real-time with cat
     except pymongo.errors.AutoReconnect:
