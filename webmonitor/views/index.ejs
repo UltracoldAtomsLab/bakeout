@@ -243,8 +243,7 @@ var getdata = function(since, cb, first) {
      var request = $.ajax({url: '/readings',
 			   data: {'sincedate': now.toDate(),
 				  'tilldate':  since.toDate()
-				 },
-			   success: function(data) { cb(data) }
+				 }
 			  });
 
      request.done(function(msg) {
