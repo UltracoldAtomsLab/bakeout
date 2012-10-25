@@ -233,6 +233,9 @@ var showReadings = function(data, first) {
    var reread = function() {
       if (readyformore) {
           lastsince = getdata(lastsince, showReadings, false);
+          for (var i=0; i < series.length; i++) {
+            series[i].data.sort(function(a, b) {return a[0]-b[0];});
+          }
       };
    }
 
