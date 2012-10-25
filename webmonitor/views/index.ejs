@@ -182,46 +182,48 @@ var limits = {
   };
 
 var showReadings = function(data, first) {
-       if (data.result != 'OK') {
-         message(data.result);
-       } else {
-           if (first) {
-               for (var i = 0; i < series.length; i++) {
-		   series[i].data = [];
-               }
-           }
-         readings = data.readings;
-         for (var i = 0; i < readings.length; i++) {
-           reading = readings[i];
-           if (fields[reading['id']]) {
-            if (limits[reading['id']] && (limits[reading['id']] <= reading.reading.value)) {
-                $("#"+reading['id']+"val").addClass("warning");
-            } else {
-                $("#"+reading['id']+"val").removeClass("warning");
-            }
+    if (data.result != 'OK') {
+        message(data.result);
+    } else {
+        if (first) {
+            var num = series.length-1;
+            do {
+		series[num].data = [];
+            } while( num-- );
+        };
+        readings = data.readings;
+        var readnum = readings.length - 1;
+        do {
+            reading = readings[readnum];
+            if (fields[reading['id']]) {
+		if (limits[reading['id']] && (limits[reading['id']] <= reading.reading.value)) {
+                    $("#"+reading['id']+"val").addClass("warning");
+		} else {
+                    $("#"+reading['id']+"val").removeClass("warning");
+		};  // End of if-warning
 
-            if (reading.type == 'temperature') {
-              if (reading.reading.value < 1000) {
-                thisone = fields[reading['id']];
-                thisone['value'].val(reading.reading.value+' '+reading.reading.unit);
-                thisone['chart'].append(new Date(reading.date).getTime(), reading.reading.value);
-              } else {
-                message(moment(reading.date).format()+" Error on channel "+reading['id']+": "+reading.err);
-              }
-            } else if (reading.type == 'pressure') {
-                thisone = fields[reading['id']];
-                thisone['value'].val(reading.reading.value.toExponential()+' '+reading.reading.unit);
-                var logval = Math.log(reading.reading.value) / Math.LN10;
-                thisone['chart'].append(new Date(reading.date).getTime(), logval);
-            }
-           } else {
-             console.log("Missing id:"+reading['id']);
-           }
-        }
-      }
-      readyformore = true;
-      loadmsg.addClass("hidden");
-   }
+		if (reading.type == 'temperature') {
+		    if (reading.reading.value < 1000) {
+			thisone = fields[reading['id']];
+			thisone['value'].val(reading.reading.value+' '+reading.reading.unit);
+			thisone['chart'].append(new Date(reading.date).getTime(), reading.reading.value);
+		    } else {
+			message(moment(reading.date).format()+" Error on channel "+reading['id']+": "+reading.err);
+		    };
+		} else if (reading.type == 'pressure') {
+                    thisone = fields[reading['id']];
+                    thisone['value'].val(reading.reading.value.toExponential()+' '+reading.reading.unit);
+                    var logval = Math.log(reading.reading.value) / Math.LN10;
+                    thisone['chart'].append(new Date(reading.date).getTime(), logval);
+		}; // end of if-type
+            } else {
+		console.log("Missing id:"+reading['id']);
+            }; // end of if-id-known
+        } while ( readnum-- ); // end of readings loop
+    }; // end of data.result OK
+    readyformore = true;
+    loadmsg.addClass("hidden");
+}; // end of showReadings
 
    var getdate = function () {
       return moment().format('MMMM Do YYYY, h:mm:ss a');
