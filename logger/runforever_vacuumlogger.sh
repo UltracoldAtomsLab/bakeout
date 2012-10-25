@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CMD="./vacuumlogger.py vacuumlogger.conf >> vacuum.csv"
+CMD="./vacuumlogger.py vacuumlogger.conf >> vacuum.csv &"
 TEXT="Vacuumlogger restarted"
 EMAIL=imrehg@gmail.com
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CMD="./iongauge01.py iongauge2.conf >> iongauge2.csv"
+CMD="./iongauge01.py iongauge2.conf >> iongauge2.csv &"
 TEXT="Ion Gauge 2 restarted"
 EMAIL=imrehg@gmail.com
 
