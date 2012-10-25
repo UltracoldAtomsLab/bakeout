@@ -3,7 +3,6 @@ hosts=localhost:27017,otherhost:27017
 database=baking
 collection=readings
 [Gauge]
-com=USB0
 baud=19200
 dbid=vc1
 gaugeid=HFIG1

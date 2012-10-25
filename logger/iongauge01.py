@@ -9,7 +9,6 @@ import ConfigParser
 
 config = ConfigParser.SafeConfigParser({'baud': 38400,
                                         'hosts': 'localhost:27017',
-                                        'com': 0,
                                         })
 if len(sys.argv) < 2:
     print("usage: %s configfile" %(sys.argv[0]))
@@ -25,22 +24,58 @@ else:
 mongos = config.get('Database', 'hosts').split(',')
 database = config.get('Database', 'database')
 collection = config.get('Database', 'collection')
-
-# Check which port to log on
-baud = config.getint('Gauge', 'baud')
-serialconn = config.get('Gauge', 'com')
-dev = serial.Serial('/dev/tty%s' %(serialconn), baud, parity=serial.PARITY_NONE, timeout=2)
 dbid = config.get('Gauge', 'dbid')
 gaugeid = config.get('Gauge', 'gaugeid')
 
-def query(cmd, bytes=None):
-    dev.write("#00"+cmd+"\r")
-    return dev.readline(bytes)
+# Check which port to log on
+baud = config.getint('Gauge', 'baud')
 
-def getPressure(gaugeid):
-    reading = query("02U%s" %(gaugeid), 11)
-    value = float(reading[1:-1])  # input format ">x.xxxE-xx\r"
-    return value
+class IonGauge:
+    """ IonGauge Controller XGS-600
+    """
+    teststring = ">0200,0150\r"  # this is our current "software revision string, the see if we found our gauge
+
+    def __init__(self, baud, usb=None):
+        found = False
+        self.dev = None
+        if usb:
+            try:
+                self.dev = serial.Serial("/dev/%s" %(usb), baud, parity=serial.PARITY_NONE, timeout=2)
+            except serial.SerialException:
+                errormsg = "Can't connect to %s" %(usb)
+        else:
+            for port in range(0, 10):
+                try:
+                    self.dev = serial.Serial('/dev/ttyUSB%s' %(port), baud, parity=serial.PARITY_NONE, timeout=2)
+                    if self.query("05", 11) == self.teststring:
+                        print "# IonGauge on ttyUSB%d" %(port)
+                        found = True
+                        break
+                except serial.SerialException:
+                    continue
+            if not found:
+                errormsg = "Can't find correct USB"
+        if not found:
+            raise IOError(errormsg)
+
+    def query(self, cmd, bytes=None):
+        """ Run a query for a given command
+        """
+        self.dev.write("#00"+cmd+"\r")
+        return self.dev.readline(bytes)
+
+    def getPressure(self, gaugeid):
+        """ Get pressure reading for a given Gauge ID
+        """
+        reading = self.query("02U%s" %(gaugeid), 11)
+        try:
+            value = float(reading[1:-1])  # input format ">x.xxxE-xx\r"
+        except ValueError:
+            value = None
+        return value, reading
+
+
+gauge = IonGauge(baud)
 
 connection = pymongo.Connection(mongos)
 db = connection[database]
@@ -67,7 +102,10 @@ while True:
         while time.time() < nexttime:
             time.sleep(0.0001)
         date = datetime.datetime.utcnow()
-        value = getPressure(gaugeid)
+        value, reading = gauge.getPressure(gaugeid)
+        if value == None:
+            print "# ValueError: %s" %(reading.strip())
+            break
         nexttime += tdelay
         senddata(date, dbid, value)
         print "%.2f,%g" %(time.time(), value)
