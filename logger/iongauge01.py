@@ -106,10 +106,11 @@ while True:
         if value == None:
             print "# ValueError: %s" %(reading.strip())
             break
-        nexttime += tdelay
-        senddata(date, dbid, value)
-        print "%.2f,%g" %(time.time(), value)
-        sys.stdout.flush()  # enables following it real-time with cat
+        if value > 0:
+            nexttime += tdelay
+            senddata(date, dbid, value)
+            print "%.2f,%g" %(time.time(), value)
+            sys.stdout.flush()  # enables following it real-time with cat
     except pymongo.errors.AutoReconnect:
 	continue
     except KeyboardInterrupt:
