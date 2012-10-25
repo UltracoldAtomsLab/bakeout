@@ -232,7 +232,7 @@ var showReadings = function(data, first) {
 
    var reread = function() {
       if (readyformore) {
-          lastsince = getdata(lastsince, showReadings, false);
+          getdata(lastsince, showReadings, false);
           for (var i=0; i < series.length; i++) {
             series[i].data.sort(function(a, b) {return a[0]-b[0];});
           }
@@ -250,6 +250,7 @@ var getdata = function(since, cb, first) {
 			  });
 
      request.done(function(msg) {
+         lastsince = now;
          cb(msg, first);
      });
 
@@ -258,8 +259,6 @@ var getdata = function(since, cb, first) {
       readyformore = true;
       loadmsg.addClass("hidden");
      });
-
-     return now;
    }
 
 var charts = [
@@ -289,7 +288,7 @@ var series = [
      <% } %>
 
       var since = moment().subtract('minutes', 10);
-      lastsince = getdata(since, showReadings, true);
+      getdata(since, showReadings, true);
       rereadID = setInterval(reread, 2000);
 
       var selectSpan = function(span) {
@@ -302,7 +301,7 @@ var series = [
         }
         var minutes = spans[span]*chw/(1000*60);
         var since = moment().subtract('minutes', minutes);
-          lastsince = getdata(since, showReadings, true);
+        getdata(since, showReadings, true);
         rereadID = setInterval(reread, 2000);
       };
 
