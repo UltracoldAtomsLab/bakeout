@@ -22,5 +22,7 @@
             {"dbid": "coldpoint", "name": "Coldpoint", "type": "temperature", "labelpos": [250, 1335], "plotpos": [5, 2], "warning": 32, "enabled": true },
             {"dbid": "vc0", "name": "Outer gauge1", "type": "pressure", "labelpos": [320, 600], "plotpos": [0, 2], "warning": 1e-5, "enabled": true },
             {"dbid": "vc1", "name": "Ion gauge1", "type": "pressure", "labelpos": [320, 800], "plotpos": [6, 2], "warning": 1e-5, "enabled": true }
+            {"dbid": "vc2", "name": "Ion gauge front", "type": "pressure", "labelpos": [15, 400], "plotpos": [6, 2], "warning": 1e-5, "enabled": true },
+            {"dbid": "vc3", "name": "External Ion Pump", "type": "pressure", "labelpos": [15, 1080], "plotpos": [6, 1], "warning": 1e-5, "enabled": true }
     ]
 }
