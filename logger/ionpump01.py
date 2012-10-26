@@ -138,7 +138,7 @@ while True:
         value = gauge.getPressure()
         if value > 0:
             nexttime += tdelay
-            # senddata(date, dbid, value)
+            senddata(date, dbid, value)
             print "%.2f,%g" %(time.time(), value)
             sys.stdout.flush()  # enables following it real-time with cat
     except pymongo.errors.AutoReconnect:
