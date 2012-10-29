@@ -104,7 +104,7 @@ app.get('/readings', function(req, res) {
     if (!limit) {
         limit = 10000;
     }
-    Reading.find({}).where('date').gte(sincedate).lt(tilldate).limit(limit).sort({'date': 1})
+    Reading.find({}).where('date').gt(sincedate).lte(tilldate).limit(limit).sort({'date': 1})
 	.exec(function(err, reading) { senddata(err, reading, res); });
 });
 
