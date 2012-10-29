@@ -142,6 +142,7 @@ input {
    <input type="radio" id="timespan1" name="radio" checked="checked" /><label for="timespan1">10 min</label>
    <input type="radio" id="timespan2" name="radio" /><label for="timespan2">1h</label>
    <input type="radio" id="timespan3" name="radio" /><label for="timespan3">12h</label>
+   <input type="radio" id="timespan4" name="radio" /><label for="timespan4">24h</label>
  </div>
 
  <div id="loading">
@@ -174,8 +175,8 @@ updateTime();
 var timedisplay = setInterval(updateTime, 1000);
 
 var chw = 550;
-var spans = [10 * 60 * 1000 / chw, 60 * 60 * 1000 / chw, 12 * 60 * 60 * 1000 / chw];  // 10 mins, 1 hour, 12 hours
-var grids = [60 * 1000, 5 * 60 * 1000, 60 * 60 * 1000]; // 1 min, 5 mins, 1 hour
+var spans = [10 * 60 * 1000 / chw, 60 * 60 * 1000 / chw, 12 * 60 * 60 * 1000 / chw, 24 * 60 * 60 * 1000 / chw];  // 10 mins, 1 hour, 12 hours, 24 hours
+var grids = [60 * 1000, 5 * 60 * 1000, 60 * 60 * 1000, 60 * 60 * 1000]; // 1 min, 5 mins, 1 hour
 var limits = {
   <% for(var i=0; i<sensors.length; i++) { %>"<%= sensors[i].dbid %>": <%= sensors[i].warning %> <% if (i<(sensors.length-1)) {%>,<% } %>
   <% } %>
@@ -195,6 +196,9 @@ var showReadings = function(data, first) {
         var readnum = readings.length - 1;
         do {
             reading = readings[readnum];
+            if (!reading) {
+                continue;
+            }
             if (fields[reading['id']]) {
 		if (limits[reading['id']] && (limits[reading['id']] <= reading.reading.value)) {
                     $("#"+reading['id']+"val").addClass("warning");
@@ -220,9 +224,10 @@ var showReadings = function(data, first) {
 		console.log("Missing id:"+reading['id']);
             }; // end of if-id-known
         } while ( readnum-- ); // end of readings loop
+        for (var i=0; i < series.length; i++) {
+           series[i].data.sort(function(a, b) {return a[0]-b[0];});
+        }
     }; // end of data.result OK
-    readyformore = true;
-    loadmsg.addClass("hidden");
 }; // end of showReadings
 
    var getdate = function () {
@@ -234,26 +239,36 @@ var showReadings = function(data, first) {
 
    var reread = function() {
       if (readyformore) {
-          getdata(lastsince, showReadings, false);
-          for (var i=0; i < series.length; i++) {
-            series[i].data.sort(function(a, b) {return a[0]-b[0];});
-          }
+          getdata(lastsince, moment(), showReadings, false);
       };
    }
 
-var getdata = function(since, cb, first) {
+var getdata = function(since, till, cb, first) {
      readyformore = false;
      loadmsg.removeClass("hidden");
-     var now = moment();
      var request = $.ajax({url: '/readings',
-			   data: {'sincedate': now.toDate(),
-				  'tilldate':  since.toDate()
+			   data: {'sincedate': since.format("YYYY-MM-DDTHH:mm:ss.SSSZ"),  // Include milliseconds!
+				  'tilldate':  till.format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+                                  'limit': 10000,
 				 }
 			  });
 
-     request.done(function(msg) {
-         lastsince = now;
-         cb(msg, first);
+     request.done(function(data) {
+	 if (data.result == 'OK') {
+             if (data.readings.length == 0) {
+                lastsince = till;
+                readyformore = true;
+                loadmsg.addClass("hidden");
+             } else {
+                cb(data, first);
+                var lasttime = moment(data.readings[data.readings.length-1].date);
+                getdata(lasttime, till, cb, false);
+             }
+	 } else {
+           message(data.result);
+           readyformore = true;
+           loadmsg.addClass("hidden");
+         }
      });
 
      request.fail(function(jqXHR, textStatus) {
@@ -290,7 +305,7 @@ var series = [
      <% } %>
 
       var since = moment().subtract('minutes', 10);
-      getdata(since, showReadings, true);
+      getdata(since, moment(), showReadings, true);
       rereadID = setInterval(reread, 2000);
 
       var selectSpan = function(span) {
@@ -303,7 +318,7 @@ var series = [
         }
         var minutes = spans[span]*chw/(1000*60);
         var since = moment().subtract('minutes', minutes);
-        getdata(since, showReadings, true);
+        getdata(since, moment(), showReadings, true);
         rereadID = setInterval(reread, 2000);
       };
 
@@ -315,6 +330,9 @@ var series = [
 			 });
       $("#timespan3").click(function() {
 			 selectSpan(2);
+			 });
+      $("#timespan4").click(function() {
+			 selectSpan(3);
 			 });
    });
 </script>

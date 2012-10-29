@@ -85,21 +85,28 @@ app.get('/', function(req, res) {
   });
 });
 
+var senddata = function(err, readings, res) {
+    console.log('sent'+readings.length);
+    if (!err) {
+        res.contentType('application/json');
+	res.send({"result": "OK", "readings": readings});
+    } else {
+        res.contentType('application/json');
+        res.send('{"result": "error reading database"}');
+        console.log(err);
+    };
+};
 
 app.get('/readings', function(req, res) {
     var sincedate = req.query['sincedate'],
-        tilldate = req.query['tilldate'];
-    Reading.find({}).where('date').lt(sincedate).gt(tilldate).sort({'date': 1})
-	.exec(function(err, readings) { 
-            if (!err) {
-              res.contentType('application/json');
-		res.send({"result": "OK", "readings": readings});
-            } else {
-              res.contentType('application/json');
-              res.send('{"result": "error reading database"}');
-              console.log(err);
-            }
-        });
+        tilldate = req.query['tilldate'],
+        limit = req.query['limit']
+    ;
+    if (!limit) {
+        limit = 10000;
+    }
+    Reading.find({}).where('date').gte(sincedate).lt(tilldate).limit(limit).sort({'date': 1})
+	.exec(function(err, reading) { senddata(err, reading, res); });
 });
 
 // Start the app
