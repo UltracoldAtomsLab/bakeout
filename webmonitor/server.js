@@ -86,7 +86,6 @@ app.get('/', function(req, res) {
 });
 
 var senddata = function(err, readings, res) {
-    console.log('sent'+readings.length);
     if (!err) {
         res.contentType('application/json');
 	res.send({"result": "OK", "readings": readings});
