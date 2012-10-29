@@ -231,7 +231,7 @@ var showReadings = function(data, first) {
 }; // end of showReadings
 
    var getdate = function () {
-      return moment().format('MMMM Do YYYY, h:mm:ss a');
+      return moment().format('MMMM Do YYYY, h:mm:ss.SSS a');
    }
    var message = function(todisplay) {
       msg.text(todisplay+'\n'+msg.text());
