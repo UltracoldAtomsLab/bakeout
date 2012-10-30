@@ -24,7 +24,6 @@ var mongos = nconf.get('mongos'),
 var sensorname = {}
 var isensin = sensorsin.length-1;
 do {
-    console.log(sensorsin[isensin].name);
     sensorname[sensorsin[isensin].dbid] = sensorsin[isensin].name
 } while( isensin-- );
 // Only load enabled sensors
