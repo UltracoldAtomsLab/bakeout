@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CMD="./iongauge01.py iongauge2.conf >> iongauge2.csv &"
-TEXT="Ion Gauge 2 restarted"
+TEXT="Ion Gauge Front restarted"
 EMAIL=imrehg@gmail.com
 
 trap ctrl_c INT
