@@ -21,6 +21,12 @@ var mongos = nconf.get('mongos'),
     database = nconf.get('database'),
     sensorsin = nconf.get('sensors');
 
+var sensorname = {}
+var isensin = sensorsin.length-1;
+do {
+    console.log(sensorsin[isensin].name);
+    sensorname[sensorsin[isensin].dbid] = sensorsin[isensin].name
+} while( isensin-- );
 // Only load enabled sensors
 var sensors = [];
 for (var i = 0; i < sensorsin.length; i++) {
@@ -106,6 +112,15 @@ app.get('/readings', function(req, res) {
     }
     Reading.find({}).where('date').gt(sincedate).lte(tilldate).limit(limit).sort({'date': 1})
 	.exec(function(err, reading) { senddata(err, reading, res); });
+});
+
+app.get('/export', function(req, res) {
+  res.render('export.ejs', {
+      layout: false,
+      version: version,
+      hostname: os.hostname(),
+      sensorlist: sensorname
+  });
 });
 
 // Start the app
