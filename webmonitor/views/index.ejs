@@ -238,7 +238,7 @@ var showReadings = function(data, first) {
                 lasttime = moment(reading.date).format('MMMM Do YYYY, H:mm:ss.SSS');
                 $("#timestamp").html(lasttime);
             } else {
-		console.log("Missing id:"+reading['id']);
+		<!-- console.log("Missing id:"+reading['id']); -->
             }; // end of if-id-known
         }; // end of readings loop
         for (var i=0; i < series.length; i++) {
