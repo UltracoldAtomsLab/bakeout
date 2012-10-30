@@ -66,7 +66,7 @@ label {
  </div>
  
  <div id="loading" class="hidden">
-  Loading data, please wait...
+  Loading data, please wait...<div id="loadnum"></div>
  </div>
 
 <div id="fields_container">
@@ -88,6 +88,7 @@ var outsensors = [];
 var outheaders = {};
 var fromtime;
 var tilltime;
+var totaldata = 0;
 
 $(document).ready(function() {
     loadmsg = $("#loading");
@@ -131,6 +132,8 @@ $(document).ready(function() {
     var handlereadings = function(data) {
 	var readings = data.readings;
 	var readnum = readings.length-1;
+        totaldata += readnum + 1;
+        $("#loadnum").html(totaldata+" points so far");
 	do {
 	    reading = readings[readnum];
 	    var id = reading.id;
@@ -151,7 +154,7 @@ $(document).ready(function() {
         var snum = outsensors.length-1;
         var text = ""
         do {
-           text += "<a id='"+outsensors[snum]+"' class='downloadlink' href='#'>"+slist[outsensors[snum]]+"</a><br>";
+           text += "<a id='"+outsensors[snum]+"' class='downloadlink' href='#'>"+slist[outsensors[snum]]+"</a>(" + outdata[outsensors[snum]].length +" points)<br>";
         } while(snum--);
 	$("#fields").html(text);
         $(".downloadlink").click(function() {
@@ -166,6 +169,8 @@ $(document).ready(function() {
 	    outdata = {};
 	    outsensors = [];
             $("#fields").html("");
+            totaldata = 0;
+	    $("#loadnum").html('');
 	};
 
 	var request = $.ajax({url: '/readings',
