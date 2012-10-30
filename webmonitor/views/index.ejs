@@ -194,7 +194,7 @@ var showReadings = function(data, first) {
         };
         readings = data.readings;
         var readnum = readings.length - 1;
-        do {
+        for (var readnum = 0; readnum < readings.length; readnum++) {
             reading = readings[readnum];
             if (!reading) {
                 continue;
@@ -223,7 +223,7 @@ var showReadings = function(data, first) {
             } else {
 		console.log("Missing id:"+reading['id']);
             }; // end of if-id-known
-        } while ( readnum-- ); // end of readings loop
+        }; // end of readings loop
         for (var i=0; i < series.length; i++) {
            series[i].data.sort(function(a, b) {return a[0]-b[0];});
         }
