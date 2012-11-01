@@ -6,6 +6,8 @@ import sys
 import pymongo
 import datetime
 import ConfigParser
+import os
+import signal
 
 config = ConfigParser.SafeConfigParser({'baud': 9600,
                                         'hosts': 'localhost:27017',
@@ -51,7 +53,13 @@ class DualGauge:
         else:
             for port in range(0, 10):
                 try:
-                    self.dev = serial.Serial("/dev/ttyUSB%d" %(port),
+                    portname = "/dev/ttyUSB%d" %(port)
+                    self.lockfile = portname.split('/')[-1] + '.lock'
+                    if os.path.exists(self.lockfile):
+                        continue
+                    else:
+                        open(self.lockfile, 'w').close()
+                    self.dev = serial.Serial(portname,
                                              baud,
                                              bytesize=serial.EIGHTBITS,
                                              stopbits=serial.STOPBITS_ONE,
@@ -63,7 +71,12 @@ class DualGauge:
                         print "# IonGauge on ttyUSB%d" %(port)
                         found = True
                         break
+                    if os.path.exists(self.lockfile):
+                        os.remove(self.lockfile)
                 except serial.SerialException:
+                    if os.path.exists(self.lockfile):
+                        os.remove(self.lockfile)
+                    self.lockfile = None
                     continue
             if not found:
                 errormsg = "Can't find correct USB"
@@ -128,6 +141,20 @@ def senddata(date, dbid, value):
                 }
     coll.insert(document)
 
+### Exit code
+def cleanup(dev):
+    print "# Exiting"
+    if dev.lockfile and os.path.exists(dev.lockfile):
+        print "# Removing lockfile"
+        os.remove(dev.lockfile)
+
+def signal_handler(signal, frame):
+    cleanup(gauge)
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, signal_handler)
+### Exit code end
+
 # Start recording
 nexttime = time.time() + tdelay
 while True:
@@ -144,4 +171,8 @@ while True:
     except pymongo.errors.AutoReconnect:
 	continue
     except KeyboardInterrupt:
+        cleanup(gauge)
         break
+    except:
+        cleanup(gauge)
+        raise
