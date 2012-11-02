@@ -1,5 +1,7 @@
 #!/usr/bin/env python2
-
+"""
+Pfeiffer Dualgauge controller
+"""
 import serial
 import time
 import sys
