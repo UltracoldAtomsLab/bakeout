@@ -141,6 +141,7 @@ while True:
         value, reading = gauge.getPressure()
         if value == None:
             print "# ValueError: %s" %(reading.strip())
+            cleanup(gauge)
             break
         if value > 0:
             nexttime += tdelay
