@@ -37,14 +37,17 @@ baud = config.getint('Gauge', 'baud')
 class IonGauge:
     """ IonGauge Controller XGS-600
     """
-    teststring = ">0200,0150\r"  # this is our current "software revision string, the see if we found our gauge
+    teststring = [">0200,0150\r", ">0170,0150\r"]  # this are our current software revision strings, the see if we found our gauge
+    lockfile = None
 
-    def __init__(self, baud, usb=None):
+    def __init__(self, gaugeid, baud=19200, usb=None):
         found = False
         self.dev = None
+        self.gaugeid = gaugeid
         if usb:
             try:
                 self.dev = serial.Serial("/dev/%s" %(usb), baud, parity=serial.PARITY_NONE, timeout=2)
+                found = True
             except serial.SerialException:
                 errormsg = "Can't connect to %s" %(usb)
         else:
@@ -58,10 +61,13 @@ class IonGauge:
                     else:
                         open(self.lockfile, 'w').close()
                     self.dev = serial.Serial(portname, baud, parity=serial.PARITY_NONE, timeout=2)
-                    if self.query("05", 11) == self.teststring:
-                        print "# IonGauge on ttyUSB%d" %(port)
-                        found = True
-                        break
+                    q = self.query("05", 11)
+                    if q in self.teststring:
+                        v, r = self.getPressure()
+                        if v is not None:
+                            print "# IonGauge on ttyUSB%d" %(port)
+                            found = True
+                            break
                     if os.path.exists(self.lockfile):
                         os.remove(self.lockfile)
                 except serial.SerialException:
@@ -80,10 +86,10 @@ class IonGauge:
         self.dev.write("#00"+cmd+"\r")
         return self.dev.readline(bytes)
 
-    def getPressure(self, gaugeid):
+    def getPressure(self):
         """ Get pressure reading for a given Gauge ID
         """
-        reading = self.query("02U%s" %(gaugeid), 11)
+        reading = self.query("02U%s" %(self.gaugeid), 11)
         try:
             value = float(reading[1:-1])  # input format ">x.xxxE-xx\r"
         except ValueError:
@@ -91,7 +97,7 @@ class IonGauge:
         return value, reading
 
 
-gauge = IonGauge(baud)
+gauge = IonGauge(gaugeid, baud)
 
 connection = pymongo.Connection(mongos)
 db = connection[database]
@@ -132,7 +138,7 @@ while True:
         while time.time() < nexttime:
             time.sleep(0.0001)
         date = datetime.datetime.utcnow()
-        value, reading = gauge.getPressure(gaugeid)
+        value, reading = gauge.getPressure()
         if value == None:
             print "# ValueError: %s" %(reading.strip())
             break
