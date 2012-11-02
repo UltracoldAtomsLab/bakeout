@@ -144,4 +144,8 @@ while True:
     except pymongo.errors.AutoReconnect:
 	continue
     except KeyboardInterrupt:
+        cleanup(gauge)
         break
+    except:
+        cleanup(gauge)
+        raise
