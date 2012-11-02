@@ -1,0 +1,2 @@
+# change values then rename this file to 'commonconf'
+EMAIL="user1@host.com,user2@host.com"

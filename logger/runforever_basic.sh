@@ -12,6 +12,7 @@ die () {
 # Load configuration
 CONF=$1
 source ${CONF}
+source commonconf
 
 # Make sure we know what are we starting
 read -p ">${NAME}< - Press [y] to start: " -n 1
