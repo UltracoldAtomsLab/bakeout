@@ -32,7 +32,7 @@ function ctrl_c() {
 
 # Run on the background
 function run_cmd() {
-    # echo "${TEXT}" | mail -s 'Bakeout' '${EMAIL}'
+    echo "${TEXT}" | mail -s 'Bakeout' ${EMAIL}
     echo ${CMD}
     eval ${CMD}
     PID=$!
