@@ -20,6 +20,7 @@ then
     echo "Stopping"
     exit 1
 fi
+echo "OK"
 
 # Capture keyboard interrupt
 trap ctrl_c INT
