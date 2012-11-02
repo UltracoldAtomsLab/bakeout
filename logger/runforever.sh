@@ -50,7 +50,7 @@ while true; do
     echo "Time: ${date}, sleep ${sleeptime}s"
     sleep ${sleeptime}
     while kill -0 "$PID"; do
-	sleep 1.0
+	sleep 0.5
         i=-1
     done
     echo "${PID} was killed!"
