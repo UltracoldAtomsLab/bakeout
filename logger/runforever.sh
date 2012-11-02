@@ -37,6 +37,9 @@ function run_cmd() {
     eval ${CMD}
     PID=$!
     echo ${PID}
+    # Give it some time to settle down, 5 seconds should be okay
+    # with this, we should notice if the program is consistently not starting
+    sleep 5
 }
 
 i=0
