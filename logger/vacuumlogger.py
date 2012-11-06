@@ -61,6 +61,7 @@ while True:
         print time.time(), ",", line
         sys.stdout.flush()  # enables following it real-time with cat
     except pymongo.errors.AutoReconnect:
-	continue
+        print "# Trying AutoReconnect"
+        continue
     except KeyboardInterrupt:
         break

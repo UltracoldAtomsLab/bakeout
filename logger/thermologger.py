@@ -75,6 +75,7 @@ while True:
             print reading  # show on standard output
             sys.stdout.flush()  # enables following it real-time with cat
     except pymongo.errors.AutoReconnect:
+        print "# Trying AutoReconnect"
         continue
     except KeyboardInterrupt:
         break

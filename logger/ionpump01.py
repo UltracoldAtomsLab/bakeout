@@ -171,6 +171,7 @@ while True:
             print "%.2f,%g" %(time.time(), value)
             sys.stdout.flush()  # enables following it real-time with cat
     except pymongo.errors.AutoReconnect:
+	print "# Trying AutoReconnect"
 	continue
     except KeyboardInterrupt:
         cleanup(gauge)
