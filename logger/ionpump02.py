@@ -205,7 +205,7 @@ while True:
             time.sleep(0.0001)
         date = datetime.datetime.utcnow()
         value = pump.getPressure()
-        if value > 0:
+        if value > 1e-11:  # 1e-11 means High Voltage off, <0 means error (in this driver's language)
             nexttime += tdelay
             senddata(date, dbid, value)
             print "%.2f,%g" %(time.time(), value)
