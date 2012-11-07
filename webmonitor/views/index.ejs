@@ -125,6 +125,10 @@ input {
  padding: 3px;
 }
 
+.stale {
+ outline: 3px solid #E09004;
+}
+
    </style>
 
     <script language="javascript" type="text/javascript" src="/js/libs/jquery-1.8.2.min.js"></script>
@@ -212,6 +216,15 @@ var limits = {
   <% } %>
   };
 
+var stalethreshold = 15 * 1000;  // milliseconds, if no reading for more than this time, show it as stale
+
+var markstale = function(id) {
+  $("#"+id+"val").addClass("stale");
+  console.log("Marked stale: "+id);
+}
+
+var stalectr = {};
+
 var showReadings = function(data, first) {
     if (data.result != 'OK') {
         message(data.result);
@@ -224,33 +237,46 @@ var showReadings = function(data, first) {
         };
         readings = data.readings;
         var readnum = readings.length - 1;
+        var now = new Date().getTime();
         for (var readnum = 0; readnum < readings.length; readnum++) {
             reading = readings[readnum];
             if (!reading) {
                 continue;
             }
             if (fields[reading['id']]) {
-		if (limits[reading['id']] && (limits[reading['id']] <= reading.reading.value)) {
-                    $("#"+reading['id']+"val").addClass("warning");
+                var rid = reading['id']
+		if (limits[rid] && (limits[rid] <= reading.reading.value)) {
+                    $("#"+rid+"val").addClass("warning");
 		} else {
-                    $("#"+reading['id']+"val").removeClass("warning");
+                    $("#"+rid+"val").removeClass("warning");
 		};  // End of if-warning
 
+                var timestamp = new Date(reading.date).getTime();
 		if (reading.type == 'temperature') {
 		    if (reading.reading.value < 1000) {
-			thisone = fields[reading['id']];
+			thisone = fields[rid];
 			thisone['value'].val(reading.reading.value+' '+reading.reading.unit);
-			thisone['chart'].append(new Date(reading.date).getTime(), reading.reading.value);
+			thisone['chart'].append(timestamp, reading.reading.value);
 		    } else {
-			message(moment(reading.date).format()+" Error on channel "+reading['id']+": "+reading.err);
+			message(moment(reading.date).format()+" Error on channel "+rid+": "+reading.err);
 		    };
 		} else if (reading.type == 'pressure') {
-                    thisone = fields[reading['id']];
+                    thisone = fields[rid];
                     thisone['value'].val(reading.reading.value.toExponential()+' '+reading.reading.unit);
                     var logval = Math.log(reading.reading.value) / Math.LN10;
-                    thisone['chart'].append(new Date(reading.date).getTime(), logval);
+                    thisone['chart'].append(timestamp, logval);
 		}; // end of if-type
                 lasttime = moment(reading.date).format('MMMM Do YYYY, H:mm:ss.SSS');
+
+                if ((now - timestamp) > stalethreshold) {
+                   $("#"+rid+"val").addClass("stale");
+                } else {
+                   $("#"+rid+"val").removeClass("stale");
+                }
+                if (stalectr[rid]) {
+                   clearTimeout(stalectr[rid]);
+                }
+                stalectr[rid] = setTimeout(markstale, stalethreshold, rid); // apparently works on Chrome while closure form gets wrong parameters
             } else {
 		<!-- console.log("Missing id:"+reading['id']); -->
             }; // end of if-id-known
