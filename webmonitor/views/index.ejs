@@ -251,11 +251,11 @@ var showReadings = function(data, first) {
                     thisone['chart'].append(new Date(reading.date).getTime(), logval);
 		}; // end of if-type
                 lasttime = moment(reading.date).format('MMMM Do YYYY, H:mm:ss.SSS');
-                $("#timestamp").html(lasttime);
             } else {
 		<!-- console.log("Missing id:"+reading['id']); -->
             }; // end of if-id-known
         }; // end of readings loop
+        $("#timestamp").html(lasttime);
         for (var i=0; i < series.length; i++) {
            series[i].data.sort(function(a, b) {return a[0]-b[0];});
         }
