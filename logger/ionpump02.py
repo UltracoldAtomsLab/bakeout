@@ -206,10 +206,12 @@ while True:
         date = datetime.datetime.utcnow()
         value = pump.getPressure()
         nexttime += tdelay
-        if value > 1e-11:  # 1e-11 means High Voltage off, <0 means error (in this driver's language)
+        if value > 1e-13:  # 1e-11 means High Voltage off, <0 means error (in this driver's language)
             senddata(date, dbid, value)
             print "%.2f,%g" %(time.time(), value)
-            sys.stdout.flush()  # enables following it real-time with cat
+        else:
+            print "# Below value? %g" %(value)
+        sys.stdout.flush()  # enables following it real-time with cat
     except pymongo.errors.AutoReconnect:
         print "# Trying AutoReconnect"
         continue
