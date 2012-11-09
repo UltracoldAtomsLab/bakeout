@@ -1,0 +1,5 @@
+[Database]
+hosts=maxwell.local:27017,einstein.local:27017,feynman.local:27017
+database=baking
+collection=readings
+dbid=rga1
