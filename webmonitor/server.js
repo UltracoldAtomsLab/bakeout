@@ -1,4 +1,4 @@
-var version = "v20121030-1223";
+var version = "v20121109-1750";
 
 // Import and setup
 var express = require('express'),
