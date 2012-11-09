@@ -122,6 +122,33 @@ app.get('/export', function(req, res) {
   });
 });
 
+app.get('/rga', function(req, res) {
+  var id = req.query['id'];
+  res.render('rga.ejs', {
+      layout: false,
+      version: version,
+      hostname: os.hostname(),
+      id: id
+  });
+});
+
+app.get('/rgadata', function(req, res) {
+    var id = req.query['id'];
+    if ((!id) || (id == 'undefined')) {
+	Reading.findOne({}).where('type').equals('rga').sort('-date')
+	    .exec(function(err, reading) { senddata(err, reading, res); });
+    } else {
+	Reading.findOne({}).where('_id').equals(id).exec(function(err, reading) { senddata(err, reading, res); });
+    }
+});
+
+app.get('/rgadatas', function(req, res) {
+    Reading.find({}).where('type').equals('rga').sort('-date').select('_id date')
+        .exec(function(err, reading) { senddata(err, reading, res); } );    
+});
+
+
+
 // Start the app
 var port = process.env.PORT || 5000;
 server.listen(port, function() {
