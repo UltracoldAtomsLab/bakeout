@@ -341,7 +341,7 @@ var getdata = function(since, till, cb, first) {
    }
 
 var charts = [
-  <% for(var i=0; i<sensors.length; i++) { %>new SmoothieChart({<% if (sensors[i].type == 'pressure') {%>'scale': 'log'<% } %>})<% if (i<(sensors.length-1)) {%>,<% } %>
+  <% for(var i=0; i<sensors.length; i++) { %>new SmoothieChart({'interpolation': 'line' <% if (sensors[i].type == 'pressure') {%>, 'scale': 'log'<% } %>})<% if (i<(sensors.length-1)) {%>,<% } %>
   <% } %>];
 
 var series = [
