@@ -36,6 +36,9 @@ amus = {2: "H2",
         28: "N2",
         # 32: "32?",
         44: "CO2",
+        # 85: "Rb87",
+        # 87: "Rb87",
+        # 40: "Ar"
         }
 testamu = amus.keys()
 testamu.sort()
@@ -45,6 +48,9 @@ styles = {2: "r-",
           28: "r--",
           32: "g-",
           44: "k-",
+          85: "y--",
+          87: "y-",
+          40: 'b--'
           }
 
 ## Connect to database
