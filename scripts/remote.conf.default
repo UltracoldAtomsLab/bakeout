@@ -1,0 +1,4 @@
+[Database]
+hosts=localhost:27017,otherhost:27017
+database=baking
+collection=readings
