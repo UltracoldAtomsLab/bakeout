@@ -77,6 +77,7 @@ for r in recs:
     dates.append(date)
     for a in testamu:
         change[a] += [out[a]]
+tzhere = pytz.timezone('Asia/Taipei')
 
 ## Plotting
 fig = pl.figure(figsize=(11.27, 8.69))  # Should be A4 size
@@ -88,13 +89,13 @@ pl.legend(loc='best')
 pl.xlabel('Date', fontsize=14)
 pl.ylabel('Ion Current (A)', fontsize=14)
 pl.title('RGA recording', fontsize=16)
-days = mdates.DayLocator()
-hours   = mdates.HourLocator()
-daysFmt = mdates.DateFormatter('%Y-%m-%d')
+days = mdates.DayLocator(tz=tzhere)
+hours   = mdates.HourLocator(tz=tzhere)
+daysFmt = mdates.DateFormatter('%Y-%m-%d %a', tz=tzhere)
 ax.xaxis.set_major_locator(days)
 ax.xaxis.set_major_formatter(daysFmt)
 ax.xaxis.set_minor_locator(hours)
-ax.format_xdata = mdates.DateFormatter('%Y-%m-%d %H:%M')
+ax.format_xdata = mdates.DateFormatter('%Y-%m-%d %H:%M', tz=tzhere)
 fig.autofmt_xdate()
 
 ## Save result
