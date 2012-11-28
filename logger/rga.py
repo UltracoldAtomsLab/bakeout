@@ -10,8 +10,7 @@ import datetime
 import ConfigParser
 import os
 import signal
-
-import bottle
+from bitstring import BitArray
 
 config = ConfigParser.SafeConfigParser({'baud': 28800,
                                         'hosts': 'localhost:27017',
@@ -116,86 +115,72 @@ class RGA:
                 break
         return "".join(out)
 
-    def query(self, cmd, **kwargs):
+    def query(self, cmd):
         self.write(cmd)
-        return self.readline(kwargs)
-                
+        return self.readline()
+
+def bintonum(x):
+    """ x is an array of bytes, return 2's complements interpetation """
+    temp = ["{0:08b}".format(ord(part)) for part in x]
+    temp.reverse() # it is little endian
+    binstr = "".join(temp)
+    val = BitArray(bin=binstr)
+    return val.int
+
+connection = pymongo.Connection(mongos)
+db = connection[database]
+coll = db[collection]
 
 rga = RGA('ttyS0')
 print "#", rga.query("ID?").strip()
-rga.write("MI1")
-rga.write("MF100")
-rga.query("FL1.0")
-rga.query("NF4")
-n = int(rga.query("HP?"))
-rga.write("HS1")
-vals = []
-print "# Startscan"
-for i in range(n):
-    x = rga.read(bytes=4)
-    # print i+1, [hex(ord(v)) for v in x]
-    r = ord(x[0]) + ord(x[1])*(2**8) + ord(x[2])*(2**8)**2 + ord(x[3])*(2**8)**3
-    print "%d, %d" %(i+1, r)
-    # r = ord(x[3]) + ord(x[2])*256 + ord(x[1])*256**2 + ord(x[0])*256**3
-    # print "%d: %d" %(i, r)
-p = rga.readline()
-# print "Pressure:", p, len(p)
-# print rga.query("HS1")
 
+def senddata(date, dbid, scan):
+    """ Sending data to the server
+    """
+    document = {"type": "rga",
+                "id": "%s" %(dbid),
+                "date": date,
+                "reading": {"scan": scan,
+                            "unit": "1e-16 A"},
+                "err": None,
+                }
+    coll.insert(document)
 
-# print rga.readline()
-# print rga.readline()
-# print rga.readline()
+def dorun(sens=4):
+    rga.write("MI1")
+    rga.write("MF200")
+    rga.query("FL1.0")
+    rga.query("NF%d" %sens)
+    n = int(rga.query("HP?"))
+    rga.write("HS1")
+    date = datetime.datetime.utcnow()
+    vals = []
+    print "# Startscan"
+    for i in range(n):
+        x = rga.read(bytes=4)
+        r = bintonum(x)
+        print "%d, %d" %(i+1, r)
+        vals += [{'amu': i+1, 'value': r}]
+    p = rga.read(bytes=4)  # Get pressure reading
+    err = rga.query("ER?")
+    print "# Error byte: %X" %(int(err))
+    print "# Filament:", rga.query("FL0")
+    senddata(date, dbid, vals)
 
+### Exit code
+def signal_handler(signal, frame):
+    print "# Filament:", rga.query("FL0")
+    sys.exit(0)
 
-print "# Filament:", rga.query("FL0")
-print rga.readline()
+signal.signal(signal.SIGTERM, signal_handler)
+### Exit code end
 
-# ### Exit code
-# def signal_handler(signal, frame):
-#     pump.cleanup()
-#     sys.exit(0)
-
-# signal.signal(signal.SIGTERM, signal_handler)
-# ### Exit code end
-
-# connection = pymongo.Connection(mongos)
-# db = connection[database]
-# coll = db[collection]
-
-# tdelay = 1
-
-# def senddata(date, dbid, value):
-#     """ Sending data to the server
-#     """
-#     document = {"type": "pressure",
-#                 "id": "%s" %(dbid),
-#                 "date": date,
-#                 "reading": {"value": value,
-#                             "unit": "torr"},
-#                 "err": None,
-#                 }
-#     coll.insert(document)
-
-# # Start recording
-# nexttime = time.time() + tdelay
-# while True:
-#     try:
-#         while time.time() < nexttime:
-#             time.sleep(0.0001)
-#         date = datetime.datetime.utcnow()
-#         value = pump.getPressure()
-#         if value > 1e-11:  # 1e-11 means High Voltage off, <0 means error (in this driver's language)
-#             nexttime += tdelay
-#             senddata(date, dbid, value)
-#             print "%.2f,%g" %(time.time(), value)
-#             sys.stdout.flush()  # enables following it real-time with cat
-#     except pymongo.errors.AutoReconnect:
-#         print "# Trying AutoReconnect"
-#         continue
-#     except KeyboardInterrupt:
-#         pump.cleanup()
-#         break
-#     except:
-#         pump.cleanup()
-#         raise
+try:
+    dorun(sens=2)
+except pymongo.errors.AutoReconnect:
+    pass
+except KeyboardInterrupt:
+    print "# Filament:", rga.query("FL0")
+except:
+    print "# Filament:", rga.query("FL0")
+    raise
