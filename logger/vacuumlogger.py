@@ -27,8 +27,8 @@ database = config.get('Database', 'database')
 
 # Check which port to log on
 baud = config.getint('Gauge', 'baud')
-serialnum = config.getint('Gauge', 'com')
-dev = serial.Serial('/dev/ttyS%d' %(serialnum), baud, timeout=2)
+serialnum = config.get('Gauge', 'com')
+dev = serial.Serial('/dev/tty%s' %(serialnum), baud, timeout=2)
 
 connection = pymongo.Connection(mongos)
 db = connection[database]
