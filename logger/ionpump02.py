@@ -38,7 +38,9 @@ class GVPump:
 
     # Partial ion pump controller model number q[2:-3]
     # Full is e.g. "07 OK 00 DIGITEL SPCe 4E\r" with channel number (07), and checksum (4E)
-    teststring = ' OK 00 DIGITEL SPCe '
+    #teststring = ' OK 00 DIGITEL SPCe '
+    # After updating, full string is "05 OK 00 SPC2 F7"
+    teststring = ' OK 00 SPC2 '
     cmdstart = '~'
     cmdterm = '\r'
 
@@ -206,7 +208,7 @@ while True:
         date = datetime.datetime.utcnow()
         value = pump.getPressure()
         nexttime += tdelay
-        if value > 1e-13:  # 1e-11 means High Voltage off, <0 means error (in this driver's language)
+        if value > 1e-13:  # 1e-13 means High Voltage off, <0 means error (in this driver's language)
             senddata(date, dbid, value)
             print "%.2f,%g" %(time.time(), value)
         else:
