@@ -200,6 +200,8 @@ var loadmsg;
 
 var readyformore = false;
 var lasttime;
+var querydelay = 2; <!-- Delay the query by this many seconds, allowing data written to database -->
+var queryrepeat = 3; <!-- How often ti requery -->
 
 // Time updating on the screen
 var timer = document.getElementById("time");
@@ -297,7 +299,7 @@ var showReadings = function(data, first) {
 
    var reread = function() {
       if (readyformore) {
-          getdata(lastsince, moment(), showReadings, false);
+          getdata(lastsince, moment().subtract('seconds', querydelay), showReadings, false);
       };
    }
 
@@ -366,9 +368,11 @@ var series = [
       chart.streamTo(document.getElementById("<%= sensors[i].dbid%>chart"));
      <% } %>
 
-      var since = moment().subtract('minutes', 10);
-      getdata(since, moment(), showReadings, true);
-      rereadID = setInterval(reread, 2000);
+      var now = moment(),
+          since = now.subtract('minutes', 10),
+          till = now.subtract('seconds', querydelay);
+      getdata(since, till, showReadings, true);
+      rereadID = setInterval(reread, queryrepeat * 1000);
 
       var selectSpan = function(span) {
         clearInterval(rereadID);
@@ -379,9 +383,11 @@ var series = [
           chart.options.grid.millisPerLine = grids[span];
         }
         var minutes = spans[span]*chw/(1000*60);
-        var since = moment().subtract('minutes', minutes);
+        var now = moment(),
+            since = now.subtract('minutes', minutes),
+            till = now.subtract('seconds', querydelay);
         getdata(since, moment(), showReadings, true);
-        rereadID = setInterval(reread, 2000);
+        rereadID = setInterval(reread, queryrepeat*1000);
       };
 
       $("#timespan1").click(function() {
