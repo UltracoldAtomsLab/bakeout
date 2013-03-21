@@ -52,6 +52,7 @@ while True:
             try:
                 idnum, tc, cc, ctime, err = reading.strip().split(",")
                 idnum, tc, cc = int(idnum), float(tc), float(cc)
+                idnum = idnum + 100  # for new monitoring
                 document = {"type": "temperature",
                             "id": "tc%d" %(idnum),
                             "date": date,
