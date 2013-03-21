@@ -38,9 +38,11 @@ class GVPump:
 
     # Partial ion pump controller model number q[2:-3]
     # Full is e.g. "07 OK 00 DIGITEL SPCe 4E\r" with channel number (07), and checksum (4E)
-    #teststring = ' OK 00 DIGITEL SPCe '
+    # teststring = ' OK 00 DIGITEL SPCe '
     # After updating, full string is "05 OK 00 SPC2 F7"
-    teststring = ' OK 00 SPC2 '
+    # teststring = ' OK 00 SPC2 '
+    # actually not, the string depends on the protocol too, go to minimal string
+    teststring= ' OK 00 '
     cmdstart = '~'
     cmdterm = '\r'
 
@@ -78,7 +80,7 @@ class GVPump:
                                              )
                     # Have to test substring, since the reply is checksummed
                     # and change according to the given instrument ID
-                    q = self.query("01")[2:-3]
+                    q = self.query("01")[2:9]
                     if q == self.teststring:
                         print "# IonPump on ttyUSB%d" %(port)
                         found = True
