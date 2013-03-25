@@ -17,6 +17,17 @@ This directory has all the hardware interfacing code. Most of it is hacked toget
 * **runconf_thermologger.sh**: temperature logging with Arduino Mega ADK, over USB CDC
 * **runconf_ionpump1.sh**: External Ion Pump measurement with Varian DualGauge
 
+## Explanation the used of configuration variables
+
+* **hosts=** the list of MongoDB hostnames:port values to try to connect to, a single replica set, eg. localhost:27017,otherhost:31000
+* **database=** name of database used in the MongoDB server
+* **collection=** name of collection used in the database
+* **baud=** when used, setting the baud rate of the serial connection
+* **dbid=** the ID used in the database for that sensor (should be unique among sensors)
+* **gaugeid=**: the Ion Gauge ID set in the controller
+* **devid=**: ion pump device ID set in the controller (internal ion pumps)
+* **comid=**: set COM port for turbo pump, in the form of comid=XYZ results in using `/dev/ttyXYZ`
+
 ## Running
 
 For example `sudo ./runforever runconf_thermologger.sh` to start the thermologger.
