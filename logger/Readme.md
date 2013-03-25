@@ -27,6 +27,7 @@ This directory has all the hardware interfacing code. Most of it is hacked toget
 * **gaugeid=**: the Ion Gauge ID set in the controller
 * **devid=**: ion pump device ID set in the controller (internal ion pumps)
 * **comid=**: set COM port for turbo pump, in the form of comid=XYZ results in using `/dev/ttyXYZ`
+* **com=**: for thermologger the serial number of the ACM-type USB device (ie. the x in ttyACMx)
 
 ## Running
 
