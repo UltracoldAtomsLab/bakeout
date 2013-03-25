@@ -15,7 +15,7 @@ var express = require('express'),
     ;
 
 // Read configuration
-nconf.file({ file: 'monitor.json' });
+nconf.file({ file: __dirname + '/' + 'monitor.json' });
 var mongos = nconf.get('mongos'),
     replicaset = nconf.get('replicaset'),
     database = nconf.get('database'),
@@ -67,6 +67,9 @@ var app = express();
 app.use(express.bodyParser());
 app.use(express.static(__dirname + '/public'));
 app.use(connect.compress());
+app.configure(function() {
+    app.set('views', __dirname + '/views');
+});
 var server = http.createServer(app)
 
 var io = require('socket.io').listen(server);
