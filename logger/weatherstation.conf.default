@@ -2,5 +2,4 @@
 hosts=localhost:27017,otherhost:27017
 database=weather
 [Gauge]
-comid=ACM0
 baud=115200
