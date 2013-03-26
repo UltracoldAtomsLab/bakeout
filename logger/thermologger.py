@@ -7,10 +7,10 @@ import pymongo
 import datetime
 import ConfigParser
 import os
+import signal
 
 config = ConfigParser.SafeConfigParser({'baud': 115200,
                                         'hosts': 'localhost:27017',
-                                        'com': 0,
                                         })
 if len(sys.argv) < 2:
     print("usage: %s configfile" %(sys.argv[0]))
@@ -71,7 +71,7 @@ class Thermologger:
                     # and change according to the given instrument ID
                     r = self.dev.readline()
                     if len(r) > 2 and r[0:len(self.teststring)] == self.teststring:
-                        print "# Thermologger on ttyUSB%d" %(port)
+                        print "# Thermologger on %s" %(portname)
                         found = True
                         break
                     if os.path.exists(self.lockfile):
