@@ -105,6 +105,14 @@ connection = pymongo.Connection(mongos)
 db = connection[database]
 coll = db.readings
 
+### Exit code
+def signal_handler(signal, frame):
+    dev.cleanup()
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, signal_handler)
+### Exit code end
+
 # Keep reading until Ctrl-C
 print "#HotJunction(C),ColdJunction(C)"
 while True:
