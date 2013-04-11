@@ -1,0 +1,206 @@
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>BOMon <%= version %> Export on <%= hostname %></title>
+  <link href="/css/jquery-ui.css" rel="stylesheet" type="text/css">
+  <link href="/css/anytime.min.css" rel="stylesheet" type="text/css">
+  <style type="text/css">
+
+body {
+  font-family: monospace;
+}
+
+label {
+ font-family: monospace;
+}
+
+.warning {
+ border: 3px solid red;
+}
+
+#loading {
+  position: absolute;
+  top: 10;
+  left: 500;
+  font-family: monospace;
+  display: block;
+  font-size: 16;
+  background: #EE8888;
+  width: 300;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+#dateselect {
+ position: absolute;
+ top: 10;
+ left: 10;
+ border: 1px solid black;
+}
+
+#fields_container {
+ position: absolute;
+ top: 60;
+ left: 10;
+ border: 1px solid black;
+}
+   </style>
+
+    <script src="/js/libs/jquery-1.8.2.min.js" type="text/javascript" ></script>
+    <script src="/js/libs/jquery-ui-1.9.0.custom.min.js" type="text/javascript" ></script>
+    <script src="/js/libs/anytime.min.js" type="text/javascript" ></script>
+    <script src="/js/libs/moment.min.js" type="text/javascript" ></script>
+   
+ </head>
+
+ <body>
+
+ <div id="dateselect">
+  Choose the starting and ending time for your query:<br>
+  <label for="from">From</label><input type="text" id="from" name="from" />
+  <label for="to">to</label><input type="text" id="to" name="to" />
+  <button id="getbtn">Get</button>
+
+ </div>
+ 
+ <div id="loading" class="hidden">
+  Loading data, please wait...<div id="loadnum"></div>
+ </div>
+
+<div id="fields_container">
+Results will appear here. Click which channel to download as CSV.
+ <div id="fields">
+ </div>
+</div>
+
+<!-- This part is duing the heavy duty -->
+<script>
+
+var slist = {};
+<% for (key in sensorlist) {%>slist["<%= key %>"] = "<%= sensorlist[key]%>";
+<% } %>
+
+var loadmsg;
+var outdata = {};
+var outsensors = [];
+var outheaders = {};
+var fromtime;
+var tilltime;
+var totaldata = 0;
+
+$(document).ready(function() {
+    loadmsg = $("#loading");
+    var timeFormat = "%Y %M %d %H:%i";
+    var timeConv = new AnyTime.Converter({format:timeFormat});
+
+    $("#from").AnyTime_picker(
+	{ format: timeFormat }
+    );
+    $("#to").AnyTime_picker(
+	{ format: timeFormat }
+    );
+    $("#to").change( function(e) {
+
+    });
+
+
+    $("#getbtn").click(function() {
+	var sincedate = moment(timeConv.parse($("#from").val()));
+	var tilldate = moment(timeConv.parse($("#to").val()));
+	getdata(sincedate, tilldate, true);
+    });
+
+    var download = function(id, link) {
+        var csv = '';
+        csv += '#Time [Unix timestamp],'+outheaders[id]+'\n';
+        var db = outdata[id];
+        for (var i = 0; i < db.length; i++) {
+             csv += db[i].t + ',' + db[i].v + '\n';
+        };
+        var timestamp = Math.round(+new Date()/1000);
+        link[0].download= id+'-'+fromtime.format()+'-'+tilltime.format()+'.csv';
+        // var encodeddata = 'data:text/csv;base64,' + btoa(csv);
+        // this.href = encodeddata;
+        // Fix from here: http://html5-demos.appspot.com/static/a.download.html
+        window.URL = window.webkitURL || window.URL;
+        var oMyBlob = new Blob([csv], { "type" : "text\/csv" }); // the blob
+        link[0].href = window.webkitURL.createObjectURL(oMyBlob);
+    }
+
+    var handlereadings = function(data) {
+	var readings = data.readings;
+	var readnum = readings.length-1;
+        totaldata += readnum + 1;
+        $("#loadnum").html(totaldata+" points so far");
+	do {
+	    reading = readings[readnum];
+	    var id = reading.id;
+	    if (!outdata[id]) {
+		outdata[id] = [];
+		outsensors.push(id);
+		outsensors.sort();
+                outheaders[id] = slist[id]+' ['+reading.reading.unit+']';
+	    }
+	    outdata[id].push({t: moment(reading.date).valueOf()/1000, v: reading.reading.value});
+	} while ( readnum-- );
+    };
+
+    var showdownloads = function() {
+        for (id in outdata) {
+           outdata[id].sort(function(a,b) {return a.t-b.t});
+        }
+        var snum = outsensors.length-1;
+        var text = ""
+        do {
+           text += "<a id='"+outsensors[snum]+"' class='downloadlink' href='#'>"+slist[outsensors[snum]]+"</a>(" + outdata[outsensors[snum]].length +" points)<br>";
+        } while(snum--);
+	$("#fields").html(text);
+        $(".downloadlink").click(function() {
+            var id = $(this).attr('id');
+	    download(id, $(this));
+        })
+    };
+
+    var getdata = function(since, till, first) {
+	loadmsg.removeClass("hidden");
+	if (first) {
+	    outdata = {};
+	    outsensors = [];
+            $("#fields").html("");
+            totaldata = 0;
+	    $("#loadnum").html('');
+	};
+
+	var request = $.ajax({url: '/readings',
+			      data: {'sincedate': since.format("YYYY-MM-DDTHH:mm:ss.SSSZ"),  // Include milliseconds!
+				     'tilldate':  till.format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+                                     'limit': 10000,
+				    }
+			     });
+        fromtime = since;
+        tilltime = till;
+	
+	request.done(function(data) {
+	    if (data.result == 'OK') {
+		if (data.readings.length == 0) {
+                    loadmsg.addClass("hidden");
+                    showdownloads();
+		} else {
+                    handlereadings(data);
+                    var lasttime = moment(data.readings[data.readings.length-1].date);
+                    getdata(lasttime, till, false);
+		}
+	    } else {
+		message(data.result);
+		loadmsg.addClass("hidden");
+            }
+	});
+	
+    };
+});
+</script>
+
+ </body>
+</html>

@@ -1,0 +1,279 @@
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>BOMon <%= version %> on <%= hostname %></title>
+  <link href="/css/jquery-ui.css" rel="stylesheet" type="text/css">
+  <link href="/css/rickshaw.css" rel="stylesheet" type="text/css">
+  <style type="text/less">
+
+   @cw: 600px;
+   @rh: 200px;
+   @roff: 400px;
+
+   #chamberdiv {
+     position:absolute;
+     top:0;
+     left:0;
+     width:1361px;
+   }
+
+  .showvals {
+   font-family: monospace;
+  }
+
+label {
+ display:block;
+ font-family: monospace;
+}
+
+input {
+ font-family: monospace;
+ font-weight: bold;
+ size: 4;
+ border: 3px solid white;
+}
+
+.warning {
+ border: 3px solid red;
+}
+
+#messages {
+  position: absolute;
+  top: 0;
+  left: 1450;
+}
+
+#messagebox {
+  width: 300;
+  height: 300;
+}
+
+#spanselect {
+  position: absolute;
+  top: 320;
+  left: 1450;
+  width: 300;
+}
+
+#loading {
+  position: absolute;
+  top: 375;
+  left: 1450;
+  font-family: monospace;
+  display: block;
+  font-size: 16;
+  background: #EE8888;
+  width: 300;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+#time {
+  position: absolute;
+  top: 10;
+  left: 10;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 25;
+  border: 1px dotted black;
+  padding: 2px;
+}
+
+#timestamp {
+  position: absolute;
+  top: 47;
+  left: 10;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 10;
+  border: 1px dotted green;
+  padding: 2px;
+}
+
+#links {
+  position: absolute;
+  top: 10;
+  left: 150;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 10;
+  border: 1px solid black;
+  padding: 2px;
+}
+
+.pressurediv {
+ border: 1px solid black;
+ width: 150px;
+ padding: 3px;
+}
+
+.stale {
+ outline: 3px solid #E09004;
+}
+
+.chart div {
+   font: 10px sans-serif;
+   background-color: steelblue;
+   text-align: right;
+   padding: 3px;
+   margin: 1px;
+   color: white;
+}
+
+ #tooltip {
+      position: absolute;
+      left: 50px;
+      top: 30px;
+    }
+
+ #title {
+      position: absolute;
+      left: 50px;
+      top: 5px;
+    }
+
+#rga_list_container {
+      position: absolute;
+      left: 900px;
+      top: 10px;
+}
+   </style>
+
+    <script language="javascript" type="text/javascript" src="/js/libs/jquery-1.8.2.min.js"></script>
+    <script src="/js/libs/jquery-ui-1.9.0.custom.min.js"></script>
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+    <script type="text/javascript" src="/js/libs/smoothie.js"></script>
+    <script type="text/javascript" src="/js/libs/moment.min.js"></script>
+    <script src="/js/libs/less-1.3.1.min.js" type="text/javascript"></script>
+    <script src="/js/libs/d3.v2.js" type="text/javascript"></script>
+ </head>
+
+ <body>
+ 
+ <div id="loading" class="hidden">
+  Loading data, please wait...
+ </div>
+
+ <div id="chart_container">
+	<div id="rgachart" class="chart"></div>
+        <div id="tooltip"></div>
+        <div id="title"></div>
+</div>
+
+ <div id="rga_list_container">
+   <ul id="rga_list">
+   </ul>
+</div>
+
+<!-- Final Scripts -->
+<!-- This part is duing the heavy duty -->
+<script type="text/javascript">
+<!-- // Bakeout related script -->
+
+var id = '<%= id %>';
+
+var data = [];
+
+var margin = {top: 60, right: 50, bottom: 30, left: 60},
+    width = 960 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
+
+var formatPercent = d3.format(".0%");
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.log()
+    .range([height, 1]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var plotdata = function(result) {
+   if (result.result == 'OK') {
+      r = result.readings.reading.scan;
+      for (var i = 0; i < r.length; i++) {
+          data.push({amu : r[i].amu, value : Math.abs(r[i].value)});
+          <!-- data.push({x : r[i].amu, y : Math.log(Math.abs(r[i].value))/Math.log(10)}); -->
+     }
+
+  time = result.readings.date;
+  time1 = moment(time).format('MMMM Do YYYY, h:mm:ss a');
+  time2 = moment(time).fromNow();
+  $("#title").html(time1+" ("+time2+")");
+  x.domain(data.map(function(d) { return d.amu; }));
+  y.domain([1, d3.max(data, function(d) { return d.value; })]);
+  
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+     .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Ion Current (x1e-16 A)");
+
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.amu); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .on("mouseover", hover);
+
+ function hover(d) {
+    d3.select("#tooltip")
+      .html("AMU: " + d.amu + ", current " + (d.value*1e-16).toExponential(3) + " A");
+  }
+   }
+}
+
+var listdata = function(result) {
+    if (result.result == 'OK') {
+     for (var i = 0; i < result.readings.length; i++) {
+       val = result.readings[i]
+       time = val.date;
+       time1 = moment(time).format('MMMM Do YYYY, h:mm:ss a');
+       time2 = moment(time).fromNow();
+       $('#rga_list').append("<li><a href=\"?id=" + val._id +"\">"+time1+" ("+time2+")</a></li>");
+     }
+    }
+}
+
+$('document').ready(function() {
+  var startq = $.ajax('/rgadata?id='+id)
+    .done(function(result) { plotdata(result) })
+    .fail(function() { alert("Can't get RGA data"); })
+
+  var startl = $.ajax('/rgadatas')
+    .done(function(result) { listdata(result); })
+    .fail(function() { alert("Can't get RGA list"); })
+
+});
+</script>
+
+
+ </body>
+</html>
