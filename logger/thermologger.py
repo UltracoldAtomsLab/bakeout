@@ -27,7 +27,7 @@ mongos = config.get('Database', 'hosts').split(',')
 database = config.get('Database', 'database')
 
 # Check which port to log on
-baud = config.getint('Gauge', 'baud')
+baud = config.getint('Device', 'baud')
 
 combase = 'ttyACM'  # the base name of USB device
 
@@ -99,7 +99,7 @@ class Thermologger:
                 print "# No lockfile to clean up"
 
 
-dev = Thermologger()
+dev = Thermologger(baud)
 
 connection = pymongo.Connection(mongos)
 db = connection[database]
