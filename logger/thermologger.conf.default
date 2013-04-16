@@ -2,4 +2,6 @@
 hosts=localhost:27017,otherhost:27017
 database=baking
 [Device]
+# base name of COM port: COM for Windows, /dev/ttyUSB or /dev/ttyACM or /dev/ttyS for Linux
+combase=/dev/ttyACM
 baud=115200

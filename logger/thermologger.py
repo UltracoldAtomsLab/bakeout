@@ -29,7 +29,7 @@ database = config.get('Database', 'database')
 # Check which port to log on
 baud = config.getint('Device', 'baud')
 
-combase = 'ttyACM'  # the base name of USB device
+combase = config.get('Device', 'combase')  # the base name of USB device
 
 class Thermologger:
     """ Thermologger device """
@@ -51,7 +51,7 @@ class Thermologger:
         else:
             for port in range(0, 10):
                 try:
-                    portname = "/dev/%s%d" %(combase, port)
+                    portname = "%s%d" %(combase, port)
                     self.lockfile = portname.split('/')[-1] + '.lock'
                     if os.path.exists(self.lockfile):
                         continue
