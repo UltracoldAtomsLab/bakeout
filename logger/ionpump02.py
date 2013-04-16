@@ -31,8 +31,9 @@ collection = config.get('Database', 'collection')
 dbid = config.get('Gauge', 'dbid')
 
 # Check which port to log on
-baud = config.getint('Gauge', 'baud')
-devid = config.getint('Gauge', 'devid')
+baud = config.getint('Device', 'baud')
+devid = config.getint('Device', 'devid')
+combase = config.get('Device', 'combase')
 
 class GVPump:
 
@@ -52,7 +53,7 @@ class GVPump:
         self.id = "%0.2X" %(idnum)
         if com:
             try:
-                self.dev = serial.Serial("/dev/%s" %(com),
+                self.dev = serial.Serial("%s" %(com),
                                          baud,
                                          bytesize=serial.EIGHTBITS,
                                          stopbits=serial.STOPBITS_ONE,
@@ -65,7 +66,7 @@ class GVPump:
         else:
             for port in range(0, 10):
                 try:
-                    portname = "/dev/ttyUSB%d" %(port)
+                    portname = "%s%d" %(combase, port)
                     self.lockfile = portname.split('/')[-1] + '.lock'
                     if os.path.exists(self.lockfile):
                         continue

@@ -3,6 +3,9 @@ hosts=localhost:27017,otherhost:27017
 database=baking
 collection=readings
 [Gauge]
+# base name of COM port: COM for Windows, /dev/ttyUSB or /dev/ttyACM or /dev/ttyS for Linux
+combase=/dev/ttyUSB
 baud=19200
 dbid=vc1
+# Gauge ID set on the device front
 gaugeid=HFIG1

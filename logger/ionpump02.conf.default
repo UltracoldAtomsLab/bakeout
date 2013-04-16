@@ -2,7 +2,10 @@
 hosts=localhost:27017,otherhost:27017
 database=baking
 collection=readings
-[Gauge]
+[Device]
+# base name of COM port: COM for Windows, /dev/ttyUSB or /dev/ttyACM or /dev/ttyS for Linux
+combase=/dev/ttyUSB
 baud=115200
 dbid=vcX
+# Gamma Vacuum Device ID
 devid=5

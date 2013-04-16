@@ -33,6 +33,7 @@ gaugeid = config.get('Gauge', 'gaugeid')
 
 # Check which port to log on
 baud = config.getint('Gauge', 'baud')
+combase = config.getint('Gauge', 'combase')
 
 class IonGauge:
     """ IonGauge Controller XGS-600
@@ -46,14 +47,14 @@ class IonGauge:
         self.gaugeid = gaugeid
         if usb:
             try:
-                self.dev = serial.Serial("/dev/%s" %(usb), baud, parity=serial.PARITY_NONE, timeout=2)
+                self.dev = serial.Serial("%s" %(usb), baud, parity=serial.PARITY_NONE, timeout=2)
                 found = True
             except serial.SerialException:
                 errormsg = "Can't connect to %s" %(usb)
         else:
             for port in range(0, 10):
                 try:
-                    portname = "/dev/ttyUSB%d" %(port)
+                    portname = "%s%d" %(combase, port)
                     self.lockfile = portname.split('/')[-1] + '.lock'
                     if os.path.exists(self.lockfile):
                         print "# Skipped %s because it appears locked" %(portname)
