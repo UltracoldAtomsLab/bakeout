@@ -41,7 +41,7 @@ class WeatherStation:
         self.dev = None
         if com:
             try:
-                self.dev = serial.Serial("/dev/%s" %(com),
+                self.dev = serial.Serial("%s" %(com),
                                          baud,
                                          timeout=1,
                                          )
@@ -51,7 +51,7 @@ class WeatherStation:
         else:
             for port in range(0, 20):
                 try:
-                    portname = "/dev/%s%d" %(combase, port)
+                    portname = "%s%d" %(combase, port)
                     self.lockfile = portname.split('/')[-1] + '.lock'
                     if os.path.exists(self.lockfile):
                         continue
