@@ -28,8 +28,8 @@ mongos = config.get('Database', 'hosts').split(',')
 database = config.get('Database', 'database')
 
 # Check which port to log on
-baud = config.getint('Gauge', 'baud')
-combase = 'ttyACM'  # the base name of USB device
+baud = config.getint('Device', 'baud')
+combase = config.get('Device', 'combase')
 
 class WeatherStation:
     """ Thermologger device """
@@ -49,14 +49,15 @@ class WeatherStation:
             except serial.SerialException:
                 errormsg = "Can't connect to %s" %(com)
         else:
-            for port in range(0, 10):
+            for port in range(0, 20):
                 try:
                     portname = "/dev/%s%d" %(combase, port)
                     self.lockfile = portname.split('/')[-1] + '.lock'
                     if os.path.exists(self.lockfile):
                         continue
                     else:
-                        open(self.lockfile, 'w').close()
+                        if os.name <> 'nt':
+                            os.open(self.lockfile, 'w').close()
                     self.dev = serial.Serial(portname,
                                              baud,
                                              timeout=1,
