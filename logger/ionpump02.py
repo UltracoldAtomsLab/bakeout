@@ -28,7 +28,7 @@ else:
 mongos = config.get('Database', 'hosts').split(',')
 database = config.get('Database', 'database')
 collection = config.get('Database', 'collection')
-dbid = config.get('Gauge', 'dbid')
+dbid = config.get('Device', 'dbid')
 
 # Check which port to log on
 baud = config.getint('Device', 'baud')
@@ -64,14 +64,15 @@ class GVPump:
             except serial.SerialException:
                 errormsg = "Can't connect to %s" %(com)
         else:
-            for port in range(0, 10):
+            for port in range(0, 20):
                 try:
                     portname = "%s%d" %(combase, port)
                     self.lockfile = portname.split('/')[-1] + '.lock'
                     if os.path.exists(self.lockfile):
                         continue
                     else:
-                        open(self.lockfile, 'w').close()
+                        if os.name <> 'nt':
+                            os.open(self.lockfile, 'w').close()
                     self.dev = serial.Serial(portname,
                                              baud,
                                              bytesize=serial.EIGHTBITS,

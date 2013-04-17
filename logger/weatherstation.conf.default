@@ -1,5 +1,7 @@
 [Database]
 hosts=localhost:27017,otherhost:27017
 database=weather
-[Gauge]
+[Device]
+# base name of COM port: COM for Windows, /dev/ttyUSB or /dev/ttyACM or /dev/ttyS for Linux
+combase=COM
 baud=115200
