@@ -1,0 +1,1 @@
+ c:\Python27\python.exe thermologger.py thermologger.conf
