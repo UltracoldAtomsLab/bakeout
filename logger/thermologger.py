@@ -49,14 +49,15 @@ class Thermologger:
             except serial.SerialException:
                 errormsg = "Can't connect to %s" %(com)
         else:
-            for port in range(0, 10):
+            for port in range(0, 20):
                 try:
                     portname = "%s%d" %(combase, port)
                     self.lockfile = portname.split('/')[-1] + '.lock'
                     if os.path.exists(self.lockfile):
                         continue
                     else:
-                        open(self.lockfile, 'w').close()
+                        if os.name <> 'nt':
+                            os.open(self.lockfile, 'w').close()
                     self.dev = serial.Serial(portname,
                                              baud,
                                              timeout=1,
@@ -99,7 +100,7 @@ class Thermologger:
                 print "# No lockfile to clean up"
 
 
-dev = Thermologger(baud)
+dev = Thermologger(None, baud)
 
 connection = pymongo.Connection(mongos)
 db = connection[database]
