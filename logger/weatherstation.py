@@ -57,7 +57,7 @@ class WeatherStation:
                         continue
                     else:
                         if os.name <> 'nt':
-                            os.open(self.lockfile, 'w').close()
+                            open(self.lockfile, 'w').close()
                     self.dev = serial.Serial(portname,
                                              baud,
                                              timeout=1,
